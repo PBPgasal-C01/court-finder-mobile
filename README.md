@@ -14,6 +14,16 @@
 
 **Court Finder** adalah aplikasi yang membantu masyarakat umum menemukan dan memantau ketersediaan fasilitas/lapangan olahraga terdekat secara real-time, menjawab kesulitan pemain kasual maupun komunitas yang sering harus datang langsung atau bergantung pada informasi tercecer di internet maupun grup chat. Selain menampilkan lokasi, aplikasi juga memberikan detail kondisi lapangan (indoor/outdoor, gratis/berbayar, material lantai,dll), bisa bermain dengan orang lain dan bisa mengecek ada event apa aja yang tersedia.Selain itu, Court Finder juga berfungsi sebagai platform bagi pemilik lapangan untuk mendaftarkan, mengelola, dan mempromosikan fasilitas olahraga mereka ke audiens yang lebih luas.
 
+## 📱 Alur Pengintegrasian dengan Aplikasi Web
+
+1. Menambahkan library http agar aplikasi bisa terhubung dengan website.
+
+2. Menggunakan kembali autentikasi yang ada pada web (login, ,logout dan register) untuk diintegrasikan ke aplikasi flutter, agar pengguna dapat login sesuai perannya dengan memberikan token id.
+
+3. Memakai library pbp_django_auth untuk mengurus request server yang berupa cookies request agar user bisa terautentikasi dan tertorisasi dengan baik.
+
+4. Mengimplementasikan REST API pada Django (views.py) dengan menggunakan Django Serializers atau JsonResponse.
+
 ## 👥 Data Kelompok
 
 | NPM        | Nama                     | Role              | Modul                       |
