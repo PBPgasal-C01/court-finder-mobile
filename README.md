@@ -43,6 +43,8 @@ https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/
 
 https://www.figma.com/design/PdASDdg1WngWONePYMoFxW/Design-System?node-id=108-727&t=Isu8lalSrYHcemyl-1
 
+https://www.figma.com/design/ezyGnnjO8O5jLVmO1aatXT/Mobile-Prototype?node-id=66-255&t=FdVNFYA7ZzYKELhm-0
+
 ## 📊 Link Sumber Dataset
 
 https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/edit?tab=t.0
