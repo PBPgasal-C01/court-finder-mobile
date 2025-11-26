@@ -1,5 +1,7 @@
+import 'package:court_finder_mobile/screens/login.dart';
 import 'package:flutter/material.dart';
-import 'screens/blog/blog_page.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,155 +12,33 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Court Finder',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B8E72)),
-        useMaterial3: true,
-      ),
-      home: const MainPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 2; // Default ke Finder (tengah)
-
-  // Placeholder pages untuk setiap menu (ini ganti aja ke modul masing-masing)
-  final List<Widget> _pages = [
-    const PlaceholderPage(title: 'Event'),
-    const PlaceholderPage(title: 'Manage'),
-    const PlaceholderPage(title: 'Finder'),
-    const BlogPage(),
-    const PlaceholderPage(title: 'Complaint'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF6B8E72),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.event, 'Event', 0),
-              _buildNavItem(Icons.edit, 'Manage', 1),
-              _buildCenterLogo(),
-              _buildNavItem(Icons.article, 'Blog', 3),
-              _buildNavItem(Icons.comment, 'Complaint', 4),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
       },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 28),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCenterLogo() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = 2;
-        });
-      },
-      child: Transform.translate(
-        offset: const Offset(0, -10),
-        child: Container(
-          width: 65,
-          height: 65,
-          decoration: BoxDecoration(
-            color: const Color(0xFF4A6B4E),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipOval(
-              child: Image.asset(
-                'static/images/cflogo2.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.location_on,
-                    color: Colors.white,
-                    size: 35,
-                  );
-                },
-              ),
-            ),
-          ),
+      child: MaterialApp(
+        title: 'Court Finder',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // TRY THIS: Try running your application with "flutter run". You'll see
+          // the application has a purple toolbar. Then, without quitting the app,
+          // try changing the seedColor in the colorScheme below to Colors.green
+          // and then invoke "hot reload" (save your changes or press the "hot
+          // reload" button in a Flutter-supported IDE, or press "r" if you used
+          // the command line to start the app).
+          //
+          // Notice that the counter didn't reset back to zero; the application
+          // state is not lost during the reload. To reset the state, use hot
+          // restart instead.
+          //
+          // This works for code too, not just values: Most code changes can be
+          // tested with just a hot reload.
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+          .copyWith(secondary: Colors.blueAccent[400]),
         ),
-      ),
-    );
-  }
-}
-
-// Placeholder page untuk setiap menu
-class PlaceholderPage extends StatelessWidget {
-  final String title;
-
-  const PlaceholderPage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: const Color(0xFF6B8E72),
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: Text(
-          '$title Page',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        home: LoginPage(),
       ),
     );
   }
