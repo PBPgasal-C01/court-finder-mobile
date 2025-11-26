@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
+import 'screens/game-scheduler/game_scheduler_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,7 +44,7 @@ class _MainPageState extends State<MainPage> {
 
   // Placeholder pages untuk setiap menu (ini ganti aja ke modul masing-masing)
   final List<Widget> _pages = [
-    const PlaceholderPage(title: 'Event'),
+    const GameSchedulerPage(),
     const PlaceholderPage(title: 'Manage'),
     const PlaceholderPage(title: 'Finder'),
     const BlogPage(),
