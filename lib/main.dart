@@ -6,6 +6,7 @@ import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
 import 'screens/game-scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
+import 'screens/manage-court/manage_court_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,12 +49,26 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     // Build pages list dengan user data
+    final request = context.watch<CookieRequest>();
+    final sessionCookie = request.cookies.values
+        .firstWhere(
+            // Mencari sessionid
+            (cookie) => cookie.name == 'sessionid', 
+            orElse: () => request.cookies.values.firstWhere(
+                // Fallback: Mencari csrftoken (jika sessionid belum ada)
+                (c) => c.name == 'csrftoken', 
+                // Fallback aman jika tidak ada satupun cookie ditemukan
+                orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
+            )
+        )
+        .value;
+
     final List<Widget> _pages = [
       const GameSchedulerPage(),
-      const PlaceholderPage(title: 'Manage'),
+      ManageCourtScreen(sessionCookie: sessionCookie), 
       widget.user != null
-          ? MyHomePage(user: widget.user!)
-          : const PlaceholderPage(title: 'Finder'),
+        ? MyHomePage(user: widget.user!)
+        : const PlaceholderPage(title: 'Finder'),
       const BlogPage(),
       const PlaceholderPage(title: 'Complaint'),
     ];

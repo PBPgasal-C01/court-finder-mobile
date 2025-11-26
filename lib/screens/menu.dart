@@ -4,7 +4,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 import '/models/user_entry.dart';
-import '/widgets/left_drawer.dart';
+import '../widgets/left_drawer.dart';
 
 class MyHomePage extends StatefulWidget {
   final UserEntry user;
