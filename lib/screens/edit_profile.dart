@@ -38,10 +38,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-        backgroundColor: green,
-      ),
+      appBar: AppBar(title: const Text("Edit Profile"), backgroundColor: green),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -122,7 +119,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: green,
                   padding: const EdgeInsets.symmetric(
-                      vertical: 14, horizontal: 30),
+                    vertical: 14,
+                    horizontal: 30,
+                  ),
                 ),
                 child: const Text(
                   "Save Changes",
@@ -133,57 +132,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
   InputDecoration _fieldStyle(String label) {
     return InputDecoration(
       labelText: label,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       filled: true,
       fillColor: Colors.grey.shade100,
     );
   }
-
-  // ===================== BOTTOM NAVIGATION ========================
-  Widget _buildBottomNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6CA06E),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navButton(Icons.event, "Event", () {}),
-          _navButton(Icons.manage_accounts, "Manage", () {}),
-          _navButton(Icons.location_on, "Finder", () {}),
-          _navButton(Icons.article, "Blog", () {}),
-          _navButton(Icons.report, "Complaint", () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ],
-      ),
-    );
-  }
 }
-

@@ -33,9 +33,24 @@ class ProfilePage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 55,
-                backgroundImage: user.photo != null
-                    ? NetworkImage(user.photo!)
-                    : const AssetImage("assets/default.png") as ImageProvider,
+                backgroundColor: const Color(0xFF6B8E72),
+                child: user.photo != null
+                    ? ClipOval(
+                        child: Image.network(
+                          user.photo!,
+                          width: 110,
+                          height: 110,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.person,
+                              size: 55,
+                              color: Colors.white,
+                            );
+                          },
+                        ),
+                      )
+                    : const Icon(Icons.person, size: 55, color: Colors.white),
               ),
               Positioned(
                 bottom: 0,
@@ -55,7 +70,11 @@ class ProfilePage extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: green,
                     ),
-                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                    child: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                   ),
                 ),
               ),
@@ -65,16 +84,8 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 40),
 
           // ================= USER INFO LIST =================
-          _infoTile(
-            icon: Icons.person,
-            label: "NAME",
-            value: user.username,
-          ),
-          _infoTile(
-            icon: Icons.email,
-            label: "EMAIL",
-            value: user.email,
-          ),
+          _infoTile(icon: Icons.person, label: "NAME", value: user.username),
+          _infoTile(icon: Icons.email, label: "EMAIL", value: user.email),
           _infoTile(
             icon: Icons.phone,
             label: "PHONE NO",
@@ -89,8 +100,6 @@ class ProfilePage extends StatelessWidget {
           const Spacer(),
         ],
       ),
-      bottomNavigationBar: _buildBottomNav(),
-      
     );
   }
 
@@ -112,58 +121,18 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    )),
-                const SizedBox(height: 3),
                 Text(
-                  value,
+                  label,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
                 ),
+                const SizedBox(height: 3),
+                Text(value, style: const TextStyle(fontSize: 16)),
               ],
             ),
-          )
-        ],
-      ),
-    );
-  }
-  // ===================== BOTTOM NAVIGATION ========================
-  Widget _buildBottomNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6CA06E),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navButton(Icons.event, "Event", () {}),
-          _navButton(Icons.manage_accounts, "Manage", () {}),
-          _navButton(Icons.location_on, "Finder", () {}),
-          _navButton(Icons.article, "Blog", () {}),
-          _navButton(Icons.report, "Complaint", () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          ),
         ],
       ),
     );

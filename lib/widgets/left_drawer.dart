@@ -28,10 +28,28 @@ class LeftDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: user.photo != null
-                        ? NetworkImage(user.photo!)
-                        : const AssetImage("assets/default.png")
-                            as ImageProvider,
+                    backgroundColor: const Color(0xFF6B8E72),
+                    child: user.photo != null
+                        ? ClipOval(
+                            child: Image.network(
+                              user.photo!,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.person,
+                                  size: 30,
+                                  color: Colors.white,
+                                );
+                              },
+                            ),
+                          )
+                        : const Icon(
+                            Icons.person,
+                            size: 30,
+                            color: Colors.white,
+                          ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -123,7 +141,9 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.logout,
               label: "Logout",
               onTap: () async {
-                await request.logout("https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/");
+                await request.logout(
+                  "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/",
+                );
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -148,13 +168,7 @@ class LeftDrawer extends StatelessWidget {
 
     return ListTile(
       leading: Icon(icon, color: green),
-      title: Text(
-        label,
-        style: const TextStyle(
-          color: green,
-          fontSize: 16,
-        ),
-      ),
+      title: Text(label, style: const TextStyle(color: green, fontSize: 16)),
       onTap: onTap,
     );
   }
