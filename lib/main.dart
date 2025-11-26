@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
 import 'screens/game-scheduler/game_scheduler_page.dart';
 
@@ -11,14 +14,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Court Finder',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B8E72)),
-        useMaterial3: true,
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child: MaterialApp(
+        title: 'Court Finder',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B8E72)),
+          useMaterial3: true,
+        ),
+        home: LoginPage(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: const MainPage(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
