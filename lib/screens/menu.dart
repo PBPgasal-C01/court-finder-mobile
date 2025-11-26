@@ -16,6 +16,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late UserEntry user;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -28,9 +29,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFFF5F5F5),
       drawer: LeftDrawer(user: user),
-
       // ============================ BODY ============================
       body: Column(
         children: [
@@ -68,14 +69,12 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // ← FIXED: This opens the drawer now
-              Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white, size: 32),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
+              IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
               ),
-
               GestureDetector(
                 onTap: () {
                   Navigator.push(

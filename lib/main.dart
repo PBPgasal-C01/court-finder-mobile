@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'models/user_entry.dart';
 import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
 import 'screens/game-scheduler/game_scheduler_page.dart';
+import 'screens/menu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,7 +35,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final UserEntry? user;
+  const MainPage({super.key, this.user});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -42,17 +45,19 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 2; // Default ke Finder (tengah)
 
-  // Placeholder pages untuk setiap menu (ini ganti aja ke modul masing-masing)
-  final List<Widget> _pages = [
-    const GameSchedulerPage(),
-    const PlaceholderPage(title: 'Manage'),
-    const PlaceholderPage(title: 'Finder'),
-    const BlogPage(),
-    const PlaceholderPage(title: 'Complaint'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Build pages list dengan user data
+    final List<Widget> _pages = [
+      const GameSchedulerPage(),
+      const PlaceholderPage(title: 'Manage'),
+      widget.user != null
+          ? MyHomePage(user: widget.user!)
+          : const PlaceholderPage(title: 'Finder'),
+      const BlogPage(),
+      const PlaceholderPage(title: 'Complaint'),
+    ];
+
     return Scaffold(
       body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(
