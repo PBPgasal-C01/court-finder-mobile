@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/blog/blog_post.dart';
 import 'blog_detail.dart';
+import 'blog_form.dart';
 
 class BlogPage extends StatefulWidget {
   const BlogPage({super.key});
@@ -103,6 +104,18 @@ No one is talking about that now. Lionel Messi was the first name to pop up.''',
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF6B8E72),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const BlogFormPage()),
+          );
+        },
+        backgroundColor: const Color(0xFF6B8E72),
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         child: Column(
           children: [
@@ -150,6 +163,7 @@ No one is talking about that now. Lionel Messi was the first name to pop up.''',
                 ),
                 child: Column(
                   children: [
+                    const SizedBox(height: 8),
                     // Search bar
                     Padding(
                       padding: const EdgeInsets.all(16.0),

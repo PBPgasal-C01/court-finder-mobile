@@ -102,34 +102,36 @@ class _MainPageState extends State<MainPage> {
           _selectedIndex = 2;
         });
       },
-      child: Container(
-        width: 70,
-        height: 70,
-        decoration: BoxDecoration(
-          color: const Color(0xFF4A6B4E),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: ClipOval(
-            child: Image.asset(
-              'static/images/cflogo2.png',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.location_on,
-                  color: Colors.white,
-                  size: 40,
-                );
-              },
+      child: Transform.translate(
+        offset: const Offset(0, -10),
+        child: Container(
+          width: 65,
+          height: 65,
+          decoration: BoxDecoration(
+            color: const Color(0xFF4A6B4E),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ClipOval(
+              child: Image.asset(
+                'static/images/cflogo2.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                    size: 35,
+                  );
+                },
+              ),
             ),
           ),
         ),
