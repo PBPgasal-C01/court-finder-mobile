@@ -14,7 +14,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>{
+class _MyHomePageState extends State<MyHomePage> {
   late UserEntry user;
 
   @override
@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-       drawer: LeftDrawer(user: user),
+      drawer: LeftDrawer(user: user),
 
       // ============================ BODY ============================
       body: Column(
@@ -41,9 +41,6 @@ class _MyHomePageState extends State<MyHomePage>{
           _buildCourtPlaceholder(),
         ],
       ),
-
-      // ======================= BOTTOM NAV BAR =======================
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -54,10 +51,7 @@ class _MyHomePageState extends State<MyHomePage>{
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color(0xFF8CB685),
-            Color(0xFF6CA06E),
-          ],
+          colors: [Color(0xFF8CB685), Color(0xFF6CA06E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -84,16 +78,30 @@ class _MyHomePageState extends State<MyHomePage>{
 
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => ProfilePage(user: user),
-                  ));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ProfilePage(user: user)),
+                  );
                 },
                 child: CircleAvatar(
                   radius: 24,
-                  backgroundImage: user.photo != null
-                      ? NetworkImage(user.photo!)
-                      : const AssetImage("assets/default.png")
-                          as ImageProvider,
+                  backgroundColor: const Color(0xFF6B8E72),
+                  child: user.photo != null
+                      ? ClipOval(
+                          child: Image.network(
+                            user.photo!,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              );
+                            },
+                          ),
+                        )
+                      : const Icon(Icons.person, color: Colors.white),
                 ),
               ),
             ],
@@ -156,7 +164,6 @@ class _MyHomePageState extends State<MyHomePage>{
     );
   }
 
-
   // ====================== POPULAR SPORTS ===========================
   Widget _buildPopularSports() {
     return Column(
@@ -177,7 +184,10 @@ class _MyHomePageState extends State<MyHomePage>{
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
               _sportIcon(Icons.sports_soccer, "Soccer"),
-              _sportIcon(Icons.sports_tennis, "Badminton"), //TODO: ganti icon nanti
+              _sportIcon(
+                Icons.sports_tennis,
+                "Badminton",
+              ), //TODO: ganti icon nanti
               _sportIcon(Icons.sports_tennis, "Tennis"),
               _sportIcon(Icons.sports_basketball, "Basketball"),
             ],
@@ -231,43 +241,4 @@ class _MyHomePageState extends State<MyHomePage>{
       ),
     );
   }
-
-  // ===================== BOTTOM NAVIGATION ========================
-  Widget _buildBottomNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6CA06E),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navButton(Icons.event, "Event", () {}),
-          _navButton(Icons.manage_accounts, "Manage", () {}),
-          _navButton(Icons.location_on, "Finder", () {}),
-          _navButton(Icons.article, "Blog", () {}),
-          _navButton(Icons.report, "Complaint", () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ],
-      ),
-    );
-  }
 }
-

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
 
@@ -24,7 +23,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   // ===================== FETCH USERS =====================
   Future<List<UserEntry>> fetchUsers(CookieRequest request) async {
-    final response = await request.get("https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/all-users");
+    final response = await request.get(
+      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/all-users",
+    );
     List<UserEntry> users = [];
 
     for (var d in response) {
@@ -44,8 +45,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(res["message"])));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(res["message"])));
 
     setState(() {
       futureUsers = fetchUsers(request);
@@ -62,8 +64,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(res["message"])));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(res["message"])));
 
     setState(() {
       futureUsers = fetchUsers(request);
@@ -76,10 +79,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Manage Users"),
-        backgroundColor: green,
-      ),
+      appBar: AppBar(title: const Text("Manage Users"), backgroundColor: green),
 
       body: FutureBuilder(
         future: futureUsers,
@@ -99,7 +99,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           );
         },
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -116,45 +115,65 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: const Row(
         children: [
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("NAME",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "NAME",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 3,
-              child: Center(
-                child: Text("EMAIL",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 3,
+            child: Center(
+              child: Text(
+                "EMAIL",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("JOINED",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "JOINED",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("STATUS",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "STATUS",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("ACTIONS",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "ACTIONS",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -165,9 +184,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         children: [
@@ -180,8 +197,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             flex: 2,
             child: Center(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: user.isActive
                       ? Colors.green.shade100
@@ -210,7 +229,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   onTap: () => _banUser(user.email),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.brown.shade400,
                       borderRadius: BorderRadius.circular(16),
@@ -227,13 +248,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   onTap: () => _deleteUser(user.email),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade600,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text("Delete",
-                        style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -243,43 +268,4 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
     );
   }
-
-    // ===================== BOTTOM NAVIGATION ========================
-  Widget _buildBottomNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6CA06E),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navButton(Icons.event, "Event", () {}),
-          _navButton(Icons.manage_accounts, "Manage", () {}),
-          _navButton(Icons.location_on, "Finder", () {}),
-          _navButton(Icons.article, "Blog", () {}),
-          _navButton(Icons.report, "Complaint", () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ],
-      ),
-    );
-  }
 }
-

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../models/blog/blog_post.dart';
 import 'blog_detail.dart';
 import 'blog_form.dart';
@@ -15,73 +17,49 @@ class _BlogPageState extends State<BlogPage> {
   List<BlogPost> _blogPosts = [];
   List<BlogPost> _filteredPosts = [];
   bool _isLoading = true;
+  String _errorMessage = '';
+
+  // Ganti dengan URL production Anda
+  static const String _baseUrl =
+      'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
 
   @override
   void initState() {
     super.initState();
-    _loadDummyData();
+    _fetchBlogPosts();
   }
 
-  void _loadDummyData() {
-    // Dummy data untuk sementara
-    _blogPosts = [
-      BlogPost(
-        id: 1,
-        author: 'Admin',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400',
-        title:
-            'Finally. Lionel Messi leads Argentina over France to win a World Cup championship.',
-        content:
-            '''The 2022 World Cup started terribly for Argentina. The shocking opening loss to Saudi Arabia — and the whispers began immediately.
-
-Will Lionel Messi end his glorious career without winning a World Cup?
-
-No one is talking about that now. Lionel Messi was the first name to pop up. The 35-year-old carried Argentina and drove them to their third World Cup title in eight games. Messi is now the second player ever to score goals in the group stage, round of 16, quarterfinals, semifinals and final of a single World Cup. The first time he can call himself a World Cup champion, it was the last chance. Now his returns in full.
-
-It came down to Argentina's Gonzalo Montiel who scored the winning penalty kick. Tears and hugs and smiles for Messi and all of Argentina, really.
-
-It had not been since 1986 when Argentina last won a World Cup carried by Diego Maradona - the man whose legend Messi has now joined after leading his nation to their third title.
-
-The 2022 World Cup belongs to Argentina. It's Argentina's third title and the first for Lionel Messi. The first time he can call himself a World Cup champion, it was his last chance. Now his returns in full.
-
-Messi, with a 3-3 (4-2 penalty kick shootout) victory over defending champion France, Lionel Messi can call himself a World Cup champion in what was probably his last chance. Now his returns in full.''',
-        createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(hours: 5)),
-      ),
-      BlogPost(
-        id: 2,
-        author: 'Admin',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400',
-        title:
-            'Finally. Lionel Messi leads Argentina over France to win a World Cup championship.',
-        content:
-            '''The 2022 World Cup started terribly for Argentina. The shocking opening loss to Saudi Arabia — and the whispers began immediately.
-
-Will Lionel Messi end his glorious career without winning a World Cup?
-
-No one is talking about that now. Lionel Messi was the first name to pop up.''',
-        createdAt: DateTime.now().subtract(const Duration(hours: 10)),
-        updatedAt: DateTime.now().subtract(const Duration(hours: 10)),
-      ),
-      BlogPost(
-        id: 3,
-        author: 'Admin',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400',
-        title:
-            'Finally. Lionel Messi leads Argentina over France to win a World Cup championship.',
-        content:
-            '''The 2022 World Cup started terribly for Argentina. The shocking opening loss to Saudi Arabia — and the whispers began immediately.''',
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-    ];
-    _filteredPosts = _blogPosts;
+  Future<void> _fetchBlogPosts() async {
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
+      _errorMessage = '';
     });
+
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/blog/api/posts/'),
+        headers: {'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _blogPosts = data.map((json) => BlogPost.fromJson(json)).toList();
+          _filteredPosts = _blogPosts;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Failed to load blog posts: ${response.statusCode}';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   void _filterPosts(String query) {
@@ -124,10 +102,6 @@ No one is talking about that now. Lionel Messi was the first name to pop up.''',
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.white),
-                    onPressed: () {},
-                  ),
                   const Text(
                     'Blog',
                     style: TextStyle(
@@ -235,6 +209,27 @@ No one is talking about that now. Lionel Messi was the first name to pop up.''',
                     Expanded(
                       child: _isLoading
                           ? const Center(child: CircularProgressIndicator())
+                          : _errorMessage.isNotEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _errorMessage,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.red,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: _fetchBlogPosts,
+                                    child: const Text('Retry'),
+                                  ),
+                                ],
+                              ),
+                            )
                           : _filteredPosts.isEmpty
                           ? const Center(
                               child: Text(
