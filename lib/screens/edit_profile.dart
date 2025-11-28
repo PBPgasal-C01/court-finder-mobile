@@ -83,7 +83,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   if (!_formKey.currentState!.validate()) return;
 
                   final response = await request.postJson(
-                    "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/edit-profile/",
+                    "http://127.0.0.1:8000/auth/edit-profile/",
                     jsonEncode({
                       "username": _usernameController.text.trim(),
                       "email": _emailController.text.trim(),

@@ -44,28 +44,28 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 2; // Default ke Finder (tengah)
+  int _selectedIndex = 2;
 
   @override
   Widget build(BuildContext context) {
-    // Build pages list dengan user data
     final request = context.watch<CookieRequest>();
     final sessionCookie = request.cookies.values
         .firstWhere(
-            // Mencari sessionid
             (cookie) => cookie.name == 'sessionid', 
             orElse: () => request.cookies.values.firstWhere(
-                // Fallback: Mencari csrftoken (jika sessionid belum ada)
                 (c) => c.name == 'csrftoken', 
-                // Fallback aman jika tidak ada satupun cookie ditemukan
                 orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
+                
             )
         )
         .value;
+        
 
-    final List<Widget> _pages = [
+    final List<Widget> pages = [
       const GameSchedulerPage(),
-      ManageCourtScreen(sessionCookie: sessionCookie), 
+      widget.user != null
+        ? ManageCourtScreen(user: widget.user!)
+        : const PlaceholderPage(title: 'Manage Court'),
       widget.user != null
         ? MyHomePage(user: widget.user!)
         : const PlaceholderPage(title: 'Finder'),
@@ -74,7 +74,7 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body: IndexedStack(index: _selectedIndex, children: pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF6B8E72),
@@ -170,7 +170,6 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-// Placeholder page untuk setiap menu
 class PlaceholderPage extends StatelessWidget {
   final String title;
 

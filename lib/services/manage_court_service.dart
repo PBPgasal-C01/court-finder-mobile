@@ -1,89 +1,75 @@
-import 'package:http/http.dart' as http;
+// lib/services/manage_court_service.dart
+
 import 'dart:convert';
-import '../models/manage-court/court.dart'; // Pastikan path import ini benar
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import '../models/manage-court/court.dart';
 
 class ManageCourtService {
-  // URL ini tidak akan dipanggil saat kita pakai mode mock
-  static const String baseUrl = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
-  static const String jsonEndpoint = '/managecourt/get-all-json/';
+  // [UBAH DI SINI] 
+  // Karena pakai Chrome & Local, gunakan http://127.0.0.1:8000
+  static const String baseUrl = 'http://127.0.0.1:8000';
+  
+  static const String jsonEndpoint = '/manage-court/get-all-json/';
 
-  Future<List<Court>> fetchMyCourts(String sessionCookie) async {
-    // --- MODE MOCK DATA (Gunakan ini sementara) ---
-    
-    // 1. Simulasi loading (tunggu 2 detik biar terasa seperti ambil data beneran)
-    await Future.delayed(const Duration(seconds: 2));
+  Future<List<Court>> fetchMyCourts(CookieRequest request) async {
+    final response = await request.get('$baseUrl$jsonEndpoint');
 
-    // 2. Kembalikan List Court palsu
-    // Kita isi dengan data yang sesuai tipe data di model (province int, facilities List<int>)
-    return [
-      Court(
-        pk: 1,
-        name: "Lapangan Futsal Garuda",
-        address: "Jl. Margonda Raya No. 123, Depok",
-        description: "Lapangan rumput sintetis standar internasional. Fasilitas lengkap.",
-        courtType: "Futsal",
-        operationalHours: "08:00 - 22:00",
-        pricePerHour: 150000.0,
-        phoneNumber: "08123456789",
-        province: 11, // Anggap saja ID 11 = DKI Jakarta
-        latitude: -6.3725,
-        longitude: 106.8294,
-        photoUrl: "https://example.com/dummy-futsal.jpg", // Bisa null atau URL gambar internet
-        facilities: [1, 3, 5], // Anggap saja ID 1=WiFi, 3=Toilet, 5=Parkir
-      ),
-      Court(
-        pk: 2,
-        name: "Arena Badminton Juara",
-        address: "Jl. Kaliurang Km 5, Yogyakarta",
-        description: "Lapangan karpet vinyl, pencahayaan terang.",
-        courtType: "Badminton",
-        operationalHours: "09:00 - 23:00",
-        pricePerHour: 75000.0,
-        phoneNumber: "08987654321",
-        province: 14, // Anggap saja ID 14 = DIY Yogyakarta
-        latitude: -7.7605,
-        longitude: 110.3840,
-        photoUrl: null, // Foto kosong
-        facilities: [2, 4], // ID fasilitas dummy
-      ),
-       Court(
-        pk: 3,
-        name: "Basket Hall Senayan (Dummy)",
-        address: "Komplek GBK",
-        description: null,
-        courtType: "Basketball",
-        operationalHours: "06:00 - 18:00",
-        pricePerHour: 200000.0,
-        phoneNumber: "021555555",
-        province: 11,
-        latitude: null,
-        longitude: null,
-        photoUrl: null, 
-        facilities: [], // Tidak ada fasilitas
-      ),
-    ];
-
-    // --- KODE ASLI (Komen dulu sampai deployment PWS selesai) ---
-    /*
-    final url = Uri.parse('$baseUrl$jsonEndpoint');
-    final response = await http.get(
-      url,
-      headers: {
-        'Cookie': sessionCookie,
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final CourtEntry courtEntry = courtEntryFromJson(response.body);
-      if (courtEntry.status == 'success') {
-        return courtEntry.courts;
-      } else {
-        throw Exception(courtEntry.status); // Atau pesan error lain
-      }
+    if (response is Map<String, dynamic>) {
+        if (response['status'] == 'success') {
+            // Encode balik ke String agar bisa masuk ke courtEntryFromJson
+            final jsonString = json.encode(response);
+            final CourtEntry courtEntry = courtEntryFromJson(jsonString);
+            return courtEntry.courts;
+        } else {
+            throw Exception('Gagal memuat data: ${response['message']}');
+        }
     } else {
-      throw Exception('Failed to load courts: Status Code ${response.statusCode}');
+        throw Exception('Format response tidak valid');
     }
-    */
+  }
+
+  Future<bool> deleteCourt(CookieRequest request, int id) async {
+    // URL Delete
+    final url = '$baseUrl/manage-court/delete/$id/'; 
+    
+    try {
+      final response = await request.post(url, {}); 
+
+      if (response['status'] == 'success') {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print("Error deleting court: $e");
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchCourtConstants(CookieRequest request) async {
+    // [UBAH DI SINI]
+    // Jangan hardcode URL, pakai variabel baseUrl di atas biar konsisten.
+    // baseUrl sudah kita set ke 127.0.0.1:8000
+    final response = await request.get('$baseUrl/manage-court/get-constants/');
+    
+    return response; 
+  }
+
+  Future<Map<String, dynamic>> createCourt(CookieRequest request, Map<String, dynamic> data) async {
+    // Sesuaikan URL dengan urls.py kamu
+    // Ingat: baseUrl sudah kamu set ke 127.0.0.1:8000
+    final response = await request.postJson(
+      '$baseUrl/manage-court/create-flutter/', 
+      jsonEncode(data),
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> editCourt(CookieRequest request, int id, Map<String, dynamic> data) async {
+    final response = await request.postJson(
+      '$baseUrl/manage-court/edit-flutter/$id/', 
+      jsonEncode(data),
+    );
+    return response;
   }
 }

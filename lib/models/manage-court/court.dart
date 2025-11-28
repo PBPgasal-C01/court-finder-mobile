@@ -10,7 +10,7 @@ String courtEntryToJson(CourtEntry data) => json.encode(data.toJson());
 
 class CourtEntry {
     String status;
-    List<Court> courts;
+    List<Court> courts; // Tetap non-nullable
 
     CourtEntry({
         required this.status,
@@ -18,8 +18,11 @@ class CourtEntry {
     });
 
     factory CourtEntry.fromJson(Map<String, dynamic> json) => CourtEntry(
-        status: json["status"] as String,
-        courts: List<Court>.from(json["courts"].map((x) => Court.fromJson(x))),
+        status: json["status"] as String? ?? "error",
+        // FIX: Handle null courts dengan default empty list
+        courts: json["courts"] != null 
+            ? List<Court>.from(json["courts"].map((x) => Court.fromJson(x)))
+            : [], // ← Jika null, return empty list
     );
 
     Map<String, dynamic> toJson() => {
@@ -37,7 +40,7 @@ class Court {
     String operationalHours;
     double pricePerHour;
     String phoneNumber;
-    int? province;
+    String? province;
     double? latitude;
     double? longitude;
     String? photoUrl;
@@ -47,15 +50,15 @@ class Court {
         required this.pk,
         required this.name,
         required this.address,
-        required this.description,
+        this.description,
         required this.courtType,
         required this.operationalHours,
         required this.pricePerHour,
         required this.phoneNumber,
-        required this.province,
-        required this.latitude,
-        required this.longitude,
-        required this.photoUrl,
+        this.province,
+        this.latitude,
+        this.longitude,
+        this.photoUrl,
         required this.facilities,
     });
 
@@ -64,7 +67,7 @@ class Court {
         name: json["name"] as String,
         address: json["address"] as String,
         description: json["description"] as String?,
-        province: json["province"] as int?,
+        province: json["province"]?.toString(),
         photoUrl: json["photo_url"] as String?,
         courtType: json["court_type"] as String,
         operationalHours: json["operational_hours"] as String,
@@ -72,7 +75,9 @@ class Court {
         pricePerHour: (json["price_per_hour"] as num).toDouble(), 
         latitude: (json["latitude"] as num?)?.toDouble(),
         longitude: (json["longitude"] as num?)?.toDouble(),
-        facilities: List<int>.from(json["facilities"].map((x) => x)),
+        facilities: json["facilities"] != null 
+            ? List<int>.from(json["facilities"].map((x) => x))
+            : [],
     );
 
     Map<String, dynamic> toJson() => {
@@ -90,41 +95,4 @@ class Court {
         "photo_url": photoUrl,
         "facilities": List<dynamic>.from(facilities.map((x) => x)),
     };
-}
-
-// Tambahkan di bagian paling bawah lib/models/manage-court/court.dart
-
-class MockCourts {
-  static List<Court> dummyData = [
-    Court(
-      pk: 1,
-      name: "Lapangan Futsal Garuda (Mock)",
-      address: "Jl. Margonda Raya No. 123, Depok",
-      description: "Lapangan rumput sintetis standar internasional.",
-      courtType: "Futsal",
-      operationalHours: "08:00 - 22:00",
-      pricePerHour: 150000.0,
-      phoneNumber: "08123456789",
-      province: 11, 
-      latitude: -6.3725,
-      longitude: 106.8294,
-      photoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Futsal_H%C3%A5kan_Sandberg.jpg/800px-Futsal_H%C3%A5kan_Sandberg.jpg", // Contoh URL gambar asli
-      facilities: [1, 3, 5],
-    ),
-    Court(
-      pk: 2,
-      name: "Arena Badminton Juara (Mock)",
-      address: "Jl. Kaliurang Km 5, Yogyakarta",
-      description: "Lapangan karpet vinyl, pencahayaan terang.",
-      courtType: "Badminton",
-      operationalHours: "09:00 - 23:00",
-      pricePerHour: 75000.0,
-      phoneNumber: "08987654321",
-      province: 14, 
-      latitude: -7.7605,
-      longitude: 110.3840,
-      photoUrl: null, // Foto kosong untuk ngetes icon default
-      facilities: [2, 4], 
-    ),
-  ];
 }

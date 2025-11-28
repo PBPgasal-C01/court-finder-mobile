@@ -1,14 +1,24 @@
+// lib/screens/manage-court/manage_court_screen.dart
 
-// lib/screens/manage_court_screen.dart
-
+import 'package:flutter/foundation.dart' show kIsWeb; // TAMBAHAN PENTING
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import '../../models/manage-court/court.dart';
+import '../../models/user_entry.dart';
 import '../../services/manage_court_service.dart';
+import '../../widgets/left_drawer.dart';
+import 'add_court_screen.dart';
+import 'edit_court_screen.dart';
+import 'court_detail_screen.dart';
 
 class ManageCourtScreen extends StatefulWidget {
-  final String sessionCookie;
+  final UserEntry user;
   
-  const ManageCourtScreen({super.key, required this.sessionCookie});
+  const ManageCourtScreen({
+    super.key,
+    required this.user,
+  });
 
   @override
   State<ManageCourtScreen> createState() => _ManageCourtScreenState();
@@ -21,12 +31,21 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
   @override
   void initState() {
     super.initState();
-    _courtsFuture = _service.fetchMyCourts(widget.sessionCookie);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCourts();
+    });
+  }
+
+  void _loadCourts() {
+    final request = context.read<CookieRequest>();
+    setState(() {
+      _courtsFuture = _service.fetchMyCourts(request);
+    });
   }
 
   void _refreshCourts() {
     setState(() {
-      _courtsFuture = _service.fetchMyCourts(widget.sessionCookie);
+      _loadCourts();
     });
   }
 
@@ -36,9 +55,10 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      drawer: LeftDrawer(user: widget.user),
       body: Column(
         children: [
-          // --- HEADER HIJAU (Sama seperti Game Scheduler) ---
+          // --- HEADER HIJAU ---
           Container(
             padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
             decoration: BoxDecoration(
@@ -55,56 +75,50 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.white, size: 28),
-                      onPressed: () {
-                        Scaffold.of(context).openDrawer();
-                      },
+                    Builder(
+                      builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      ),
                     ),
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 20,
                       backgroundColor: Colors.grey,
-                      child: Icon(Icons.person, color: Colors.white),
+                      child: widget.user.photo != null
+                        ? ClipOval(
+                            child: Image.network(
+                              widget.user.photo!,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.person, color: Colors.white),
+                            ),
+                          )
+                        : const Icon(Icons.person, color: Colors.white),
                     ),
                   ],
                 ),
                 const SizedBox(height: 15),
                 
-                // Title (Centered)
-                const Center(
-                  child: Text(
-                    "Manage Your Court",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Search Bar & Add Button
+                // Title & Add Button
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Container(
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            hintText: "Search Court",
-                            prefixIcon: Icon(Icons.search),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 10),
-                          ),
-                        ),
+                    // Title
+                    const Text(
+                      "Manage\nYour\nCourt",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.2,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    // Add New Button (Konsisten dengan style)
+                    // Add New Button
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
@@ -112,20 +126,23 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: InkWell(
-                        onTap: () {
-                          // TODO: Navigasi ke AddCourtScreen
-                          print('Navigasi ke halaman Tambah Lapangan');
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AddCourtScreen()),
+                          );
+                          _refreshCourts();
                         },
                         child: Row(
                           children: const [
                             Icon(Icons.add, color: Color(0xFF6B8E72), size: 20),
                             SizedBox(width: 4),
                             Text(
-                              "ADD",
+                              "Add New",
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: Color(0xFF6B8E72),
-                                fontSize: 12,
+                                fontSize: 14,
                               ),
                             ),
                           ],
@@ -186,45 +203,42 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                   );
                 }
                 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                final courts = snapshot.data ?? [];
+                
+                if (courts.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Empty State Logo (Konsisten dengan Game Scheduler)
-                        Image.asset(
-                          'static/images/cflogo2.png',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            // Fallback jika image tidak ada
-                            return Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: primaryGreen.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.sports_soccer,
-                                size: 50,
-                                color: primaryGreen,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
+                        // Empty State Logo (Ganti Icon biar aman)
+                        Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: primaryGreen.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.location_on,
+                              size: 80,
+                              color: primaryGreen,
+                            ),
+                          ),
+                        const SizedBox(height: 20),
                         const Text(
-                          "You don't have any court yet.",
-                          style: TextStyle(color: Colors.grey),
+                          "Don't have any Court",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 8),
                         const Text(
-                          "Click ADD to create your first court.",
+                          "Click ADD NEW",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black54,
+                            color: Colors.black87,
+                            fontSize: 16,
                           ),
                         ),
                       ],
@@ -232,8 +246,7 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                   );
                 }
 
-                // Data berhasil dimuat - Tampilkan Grid Cards
-                final courts = snapshot.data!;
+                // Tampilkan Grid Cards
                 return RefreshIndicator(
                   onRefresh: () async {
                     _refreshCourts();
@@ -243,7 +256,7 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.75,
+                      childAspectRatio: 0.68,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
@@ -251,10 +264,12 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                     itemBuilder: (context, index) {
                       final court = courts[index];
                       
-                      // Logika URL Gambar
-                      String baseUrl = 'http://10.0.2.2:8000';
+                      // --- PERBAIKAN 1: LOGIKA URL GAMBAR (WEB VS ANDROID) ---
+                      // Jika Web (Chrome), pakai localhost. Jika Android, pakai 10.0.2.2.
+                      final String baseUrl = kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
+                      
                       String imageUrl;
-                      if (court.photoUrl != null) {
+                      if (court.photoUrl != null && court.photoUrl!.isNotEmpty) {
                         if (court.photoUrl!.startsWith('http')) {
                           imageUrl = court.photoUrl!;
                         } else {
@@ -265,131 +280,201 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                       }
 
                       return Card(
-                        elevation: 2,
+                        elevation: 3,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: InkWell(
-                          onTap: () {
-                            // TODO: Navigate to detail
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Detail ${court.name}"),
-                                backgroundColor: primaryGreen,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Header dengan nama dan type
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
                               ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Image Section
-                              Expanded(
-                                flex: 3,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    court.name.toUpperCase(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                      letterSpacing: 0.5,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  child: (court.photoUrl != null && court.photoUrl!.isNotEmpty)
-                                    ? Image.network(
-                                        imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => 
-                                          Container(
-                                            color: primaryGreen.withOpacity(0.1),
-                                            child: Icon(
-                                              Icons.sports_soccer,
-                                              size: 50,
-                                              color: primaryGreen,
-                                            ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    court.courtType,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Tanggal dan ID
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().year.toString().substring(2)}',
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${court.pricePerHour.toStringAsFixed(0)}H',
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Image Section
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(0),
+                                child: (imageUrl.isNotEmpty)
+                                  ? Image.network(
+                                      imageUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => 
+                                        Container(
+                                          color: Colors.grey.shade200,
+                                          child: Icon(
+                                            Icons.sports_soccer,
+                                            size: 40,
+                                            color: Colors.grey.shade400,
                                           ),
-                                      )
-                                    : Container(
-                                        color: primaryGreen.withOpacity(0.1),
-                                        child: Icon(
-                                          Icons.sports_soccer,
-                                          size: 50,
-                                          color: primaryGreen,
+                                        ),
+                                    )
+                                  : Container(
+                                      color: Colors.grey.shade200,
+                                      child: Icon(
+                                        Icons.sports_soccer,
+                                        size: 40,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    ),
+                              ),
+                            ),
+
+                            // Alamat
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Text(
+                                court.address,
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+
+                            // Action Buttons Section
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // See Detail Button
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => CourtDetailScreen(court: court),
+                                          ),
+                                        );
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Colors.black, width: 1),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                      ),
+                                      child: const Text(
+                                        'SEE DETAIL',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                ),
-                              ),
-                              // Info Section
-                              Expanded(
-                                flex: 2,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            court.name,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            court.courtType,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Rp ${court.pricePerHour.toStringAsFixed(0)}/jam',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: primaryGreen,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      // Action Buttons
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          // Edit Button
-                                          IconButton(
-                                            icon: const Icon(Icons.edit, size: 20),
-                                            color: Colors.blue,
-                                            padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(),
-                                            onPressed: () {
-                                              // TODO: Navigate to edit
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(content: Text("Edit feature coming soon")),
-                                              );
-                                            },
-                                          ),
-                                          const SizedBox(width: 8),
-                                          // Delete Button
-                                          IconButton(
-                                            icon: const Icon(Icons.delete, size: 20),
-                                            color: Colors.red,
-                                            padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(),
-                                            onPressed: () {
-                                              _showDeleteDialog(context, court, primaryGreen);
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  
+                                  const SizedBox(width: 8),
+                                  
+                                  // --- PERBAIKAN 2: GANTI GAMBAR SAMPAH JADI ICON ---
+                                  // Biar ga error 404 karena file 'transh.png' ga ketemu
+                                  InkWell(
+                                    onTap: () {
+                                      _showDeleteDialog(context, court, primaryGreen);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withOpacity(0.1), // Background merah muda dikit
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete_outline, // Pakai Icon bawaan Flutter
+                                        color: Colors.red, 
+                                        size: 20
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  const SizedBox(width: 8),
+
+                                  // Edit Button (Ganti jadi Icon juga biar seragam & aman)
+                                  InkWell(
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditCourtScreen(court: court),
+                                        ),
+                                      );
+                                      _refreshCourts();
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.edit,
+                                        color: Colors.blue,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -410,28 +495,46 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text("Delete Court"),
-          content: Text("Are you sure you want to delete ${court.name}?"),
+          content: Text("Are you sure you want to delete '${court.name}'?"),
           actions: <Widget>[
             TextButton(
               child: const Text("Cancel"),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
-              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+              child: const Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
+                final request = context.read<CookieRequest>();
                 
-                // TODO: Panggil Service Delete
-                // await _service.deleteCourt(court.pk, widget.sessionCookie);
-                
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("${court.name} deleted successfully (Simulation)"),
-                    backgroundColor: primaryGreen,
-                  ),
-                );
-                
-                _refreshCourts();
+                try {
+                    final success = await _service.deleteCourt(request, court.pk);
+                    
+                    if (context.mounted) { 
+                        if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text("${court.name} deleted successfully!"),
+                                    backgroundColor: primaryGreen,
+                                ),
+                            );
+                            _refreshCourts();
+                        } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Failed to delete court. Please try again."),
+                                    backgroundColor: Colors.red,
+                                ),
+                            );
+                        }
+                    }
+                } catch (e) {
+                    if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Error: $e")),
+                        );
+                    }
+                }
               },
             ),
           ],
