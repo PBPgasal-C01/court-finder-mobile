@@ -21,7 +21,7 @@ class _BlogPageState extends State<BlogPage> {
 
   // Ganti dengan URL production Anda
   static const String _baseUrl =
-      'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
+      'http://127.0.0.1:8000';
 
   @override
   void initState() {

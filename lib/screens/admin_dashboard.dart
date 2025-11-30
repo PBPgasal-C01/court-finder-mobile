@@ -24,7 +24,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   // ===================== FETCH USERS =====================
   Future<List<UserEntry>> fetchUsers(CookieRequest request) async {
     final response = await request.get(
-      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/all-users",
+      "http://127.0.0.1:8000/auth/all-users",
     );
     List<UserEntry> users = [];
 
@@ -40,7 +40,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final request = context.read<CookieRequest>();
 
     final res = await request.postJson(
-      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/ban-user",
+      "http://127.0.0.1:8000/auth/ban-user",
       jsonEncode({"email": email}),
     );
 
@@ -59,7 +59,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     final request = context.read<CookieRequest>();
 
     final res = await request.postJson(
-      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/delete-user",
+      "http://127.0.0.1:8000/auth/delete-user",
       jsonEncode({"email": email}),
     );
 

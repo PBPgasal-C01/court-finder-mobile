@@ -6,6 +6,7 @@ import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
 import 'screens/game-scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
+import 'screens/manage-court/manage_court_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,23 +44,37 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 2; // Default ke Finder (tengah)
+  int _selectedIndex = 2;
 
   @override
   Widget build(BuildContext context) {
-    // Build pages list dengan user data
-    final List<Widget> _pages = [
+    final request = context.watch<CookieRequest>();
+    final sessionCookie = request.cookies.values
+        .firstWhere(
+            (cookie) => cookie.name == 'sessionid', 
+            orElse: () => request.cookies.values.firstWhere(
+                (c) => c.name == 'csrftoken', 
+                orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
+                
+            )
+        )
+        .value;
+        
+
+    final List<Widget> pages = [
       const GameSchedulerPage(),
-      const PlaceholderPage(title: 'Manage'),
       widget.user != null
-          ? MyHomePage(user: widget.user!)
-          : const PlaceholderPage(title: 'Finder'),
+        ? ManageCourtScreen(user: widget.user!)
+        : const PlaceholderPage(title: 'Manage Court'),
+      widget.user != null
+        ? MyHomePage(user: widget.user!)
+        : const PlaceholderPage(title: 'Finder'),
       const BlogPage(),
       const PlaceholderPage(title: 'Complaint'),
     ];
 
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body: IndexedStack(index: _selectedIndex, children: pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF6B8E72),
@@ -155,7 +170,6 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-// Placeholder page untuk setiap menu
 class PlaceholderPage extends StatelessWidget {
   final String title;
 
