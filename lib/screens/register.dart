@@ -35,68 +35,69 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> registerUser() async {
-  print("REGISTER BUTTON PRESSED");
+    print("REGISTER BUTTON PRESSED");
 
-  bool valid = _formKey.currentState!.validate();
-  print("FORM VALID? $valid");
+    bool valid = _formKey.currentState!.validate();
+    print("FORM VALID? $valid");
 
-  if (!valid) {
-    setState(() {});   // <-- IMPORTANT: forces error messages to appear
-    print("FORM INVALID - STOP");
-    return;
-  }
+    if (!valid) {
+      setState(() {}); // <-- IMPORTANT: forces error messages to appear
+      print("FORM INVALID - STOP");
+      return;
+    }
 
-  print("FORM IS VALID - CONTINUING");
+    print("FORM IS VALID - CONTINUING");
 
-  final url = Uri.parse("http://127.0.0.1:8000/auth/register-flutter/"); 
-
-  print("SENDING MULTIPART REQUEST...");
-
-  var request = http.MultipartRequest("POST", url);
-  request.fields['email'] = _emailController.text.trim();
-  request.fields['username'] = _usernameController.text.trim();
-  request.fields['preference'] = _preference;
-  request.fields['password1'] = _password1Controller.text.trim();
-  request.fields['password2'] = _password2Controller.text.trim();
-
-  if (_selectedImage != null) {
-    print("ATTACHING IMAGE: ${_selectedImage!.path}");
-    request.files.add(await http.MultipartFile.fromPath(
-      "photo",
-      _selectedImage!.path,
-    ));
-  } else {
-    print("NO IMAGE SELECTED");
-  }
-
-  print("AWAITING RESPONSE...");
-  var response = await request.send();
-
-  print("RESPONSE RECEIVED: status=${response.statusCode}");
-
-  var body = await response.stream.bytesToString();
-  print("RAW BODY: $body");
-
-  var data = jsonDecode(body);
-  print("DECODED DATA:");
-  print(data);
-
-  if (!mounted) return;
-
-  if (data["status"] == true) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(data["message"] ?? "Successfully registered!")),
+    final url = Uri.parse(
+      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/register-flutter/",
     );
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(data["message"] ?? "Failed to register")),
-    );
+
+    print("SENDING MULTIPART REQUEST...");
+
+    var request = http.MultipartRequest("POST", url);
+    request.fields['email'] = _emailController.text.trim();
+    request.fields['username'] = _usernameController.text.trim();
+    request.fields['preference'] = _preference;
+    request.fields['password1'] = _password1Controller.text.trim();
+    request.fields['password2'] = _password2Controller.text.trim();
+
+    if (_selectedImage != null) {
+      print("ATTACHING IMAGE: ${_selectedImage!.path}");
+      request.files.add(
+        await http.MultipartFile.fromPath("photo", _selectedImage!.path),
+      );
+    } else {
+      print("NO IMAGE SELECTED");
+    }
+
+    print("AWAITING RESPONSE...");
+    var response = await request.send();
+
+    print("RESPONSE RECEIVED: status=${response.statusCode}");
+
+    var body = await response.stream.bytesToString();
+    print("RAW BODY: $body");
+
+    var data = jsonDecode(body);
+    print("DECODED DATA:");
+    print(data);
+
+    if (!mounted) return;
+
+    if (data["status"] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data["message"] ?? "Successfully registered!")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data["message"] ?? "Failed to register")),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +147,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.all(Radius.circular(12.0)),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 8.0),
+                          horizontal: 12.0,
+                          vertical: 8.0,
+                        ),
                       ),
                       validator: (v) {
                         if (v == null || v.isEmpty) return "Email required";
@@ -166,7 +169,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.all(Radius.circular(12.0)),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 8.0),
+                          horizontal: 12.0,
+                          vertical: 8.0,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12.0),
@@ -182,11 +187,17 @@ class _RegisterPageState extends State<RegisterPage> {
                       value: _preference,
                       items: const [
                         DropdownMenuItem(
-                            value: "Outdoor", child: Text("Outdoor")),
+                          value: "Outdoor",
+                          child: Text("Outdoor"),
+                        ),
                         DropdownMenuItem(
-                            value: "Indoor", child: Text("Indoor")),
+                          value: "Indoor",
+                          child: Text("Indoor"),
+                        ),
                         DropdownMenuItem(
-                            value: "Both", child: Text("Indoor & Outdoor")),
+                          value: "Both",
+                          child: Text("Indoor & Outdoor"),
+                        ),
                       ],
                       onChanged: (v) => setState(() => _preference = v!),
                     ),
@@ -223,7 +234,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.all(Radius.circular(12.0)),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 8.0),
+                          horizontal: 12.0,
+                          vertical: 8.0,
+                        ),
                       ),
                       validator: (v) {
                         if (v == null || v.isEmpty) return "Password required";
@@ -244,7 +257,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.all(Radius.circular(12.0)),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 8.0),
+                          horizontal: 12.0,
+                          vertical: 8.0,
+                        ),
                       ),
                       validator: (v) {
                         if (v != _password1Controller.text) {
@@ -261,8 +276,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 50),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                       ),
                       child: const Text('Register'),

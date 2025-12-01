@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import '../../models/blog/blog_post.dart';
+import '../../models/user_entry.dart';
 import 'blog_detail.dart';
 import 'blog_form.dart';
 
 class BlogPage extends StatefulWidget {
-  const BlogPage({super.key});
+  final UserEntry? user;
+  const BlogPage({super.key, this.user});
 
   @override
   State<BlogPage> createState() => _BlogPageState();
@@ -18,15 +22,19 @@ class _BlogPageState extends State<BlogPage> {
   List<BlogPost> _filteredPosts = [];
   bool _isLoading = true;
   String _errorMessage = '';
+  final Set<int> _favoriteIds = <int>{};
 
   // Ganti dengan URL production Anda
   static const String _baseUrl =
-      'http://127.0.0.1:8000';
+      'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
 
   @override
   void initState() {
     super.initState();
     _fetchBlogPosts();
+    if (widget.user != null) {
+      _fetchFavorites();
+    }
   }
 
   Future<void> _fetchBlogPosts() async {
@@ -62,6 +70,23 @@ class _BlogPageState extends State<BlogPage> {
     }
   }
 
+  Future<void> _fetchFavorites() async {
+    if (!mounted) return;
+    final request = context.read<CookieRequest>();
+    try {
+      final response = await request.get('$_baseUrl/blog/api/favorites/');
+      if (response != null && response['favorite_ids'] != null) {
+        setState(() {
+          _favoriteIds.clear();
+          _favoriteIds.addAll(List<int>.from(response['favorite_ids']));
+        });
+      }
+    } catch (e) {
+      // Silent fail for favorites, tidak critical
+      debugPrint('Failed to fetch favorites: $e');
+    }
+  }
+
   void _filterPosts(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -78,21 +103,146 @@ class _BlogPageState extends State<BlogPage> {
     });
   }
 
+  Future<void> _toggleFavorite(BlogPost post) async {
+    if (widget.user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to add favorites')),
+      );
+      return;
+    }
+
+    // Optimistic update UI
+    final wasFavorited = _favoriteIds.contains(post.id);
+    setState(() {
+      if (wasFavorited) {
+        _favoriteIds.remove(post.id);
+      } else {
+        _favoriteIds.add(post.id);
+      }
+    });
+
+    // Sync dengan backend
+    try {
+      final request = context.read<CookieRequest>();
+      final response = await request.post(
+        '$_baseUrl/blog/api/posts/${post.id}/favorite/',
+        {},
+      );
+
+      if (response['ok'] == true) {
+        // Backend confirm success
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              response['favorited'] == true
+                  ? 'Added to favorites'
+                  : 'Removed from favorites',
+            ),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      } else {
+        // Revert jika gagal
+        setState(() {
+          if (wasFavorited) {
+            _favoriteIds.add(post.id);
+          } else {
+            _favoriteIds.remove(post.id);
+          }
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update favorite')),
+        );
+      }
+    } catch (e) {
+      // Revert on error
+      setState(() {
+        if (wasFavorited) {
+          _favoriteIds.add(post.id);
+        } else {
+          _favoriteIds.remove(post.id);
+        }
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
+
+  void _openFavorites() {
+    final favorites = _blogPosts
+        .where((p) => _favoriteIds.contains(p.id))
+        .toList();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('My Favorites'),
+            backgroundColor: const Color(0xFF6B8E72),
+            foregroundColor: Colors.white,
+          ),
+          body: favorites.isEmpty
+              ? const Center(child: Text('No favorites yet'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: favorites.length,
+                  itemBuilder: (context, index) =>
+                      _buildBlogListItem(favorites[index]),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deletePost(BlogPost post) async {
+    try {
+      final resp = await http.delete(
+        Uri.parse('$_baseUrl/blog/api/posts/${post.id}/'),
+        headers: {'Accept': 'application/json'},
+      );
+      if (resp.statusCode == 204 || resp.statusCode == 200) {
+        setState(() {
+          _blogPosts.removeWhere((p) => p.id == post.id);
+          _filteredPosts.removeWhere((p) => p.id == post.id);
+          _favoriteIds.remove(post.id);
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Post deleted')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete: ${resp.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error deleting: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF6B8E72),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const BlogFormPage()),
-          );
-        },
-        backgroundColor: const Color(0xFF6B8E72),
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: (widget.user?.isSuperuser ?? false)
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BlogFormPage()),
+                );
+              },
+              backgroundColor: const Color(0xFF6B8E72),
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.add),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         child: Column(
@@ -179,9 +329,7 @@ class _BlogPageState extends State<BlogPage> {
                                 Icons.favorite,
                                 color: Colors.white,
                               ),
-                              onPressed: () {
-                                // TODO: Navigate to favorites
-                              },
+                              onPressed: _openFavorites,
                             ),
                           ),
                         ],
@@ -327,15 +475,31 @@ class _BlogPageState extends State<BlogPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                post.title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      post.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _favoriteIds.contains(post.id)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: Colors.pinkAccent,
+                    ),
+                    onPressed: () => _toggleFavorite(post),
+                  ),
+                ],
               ),
             ],
           ),
@@ -361,14 +525,58 @@ class _BlogPageState extends State<BlogPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    post.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          post.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (widget.user?.isSuperuser ?? false)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 20,
+                            color: Colors.red,
+                          ),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Delete Post'),
+                                content: const Text(
+                                  'Are you sure you want to delete this post?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              await _deletePost(post);
+                            }
+                          },
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -400,22 +608,36 @@ class _BlogPageState extends State<BlogPage> {
               ),
             ),
             const SizedBox(width: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                post.thumbnailUrl,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
+            Stack(
+              alignment: Alignment.topRight,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    post.thumbnailUrl,
                     width: 80,
                     height: 80,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image, color: Colors.grey),
-                  );
-                },
-              ),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image, color: Colors.grey),
+                      );
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    _favoriteIds.contains(post.id)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: Colors.pinkAccent,
+                  ),
+                  onPressed: () => _toggleFavorite(post),
+                ),
+              ],
             ),
           ],
         ),
