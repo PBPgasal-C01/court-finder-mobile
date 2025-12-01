@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:court_finder_mobile/screens_complain/menu_complain.dart'; 
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'models/user_entry.dart';
+import 'screens/login.dart';
+import 'screens/blog/blog_page.dart';
+import 'screens/game-scheduler/game_scheduler_page.dart';
+import 'screens/menu.dart';
+import 'screens/manage-court/manage_court_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,20 +17,178 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Court Finder',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF7FA580), 
-          primary: const Color(0xFF7FA580),
-          secondary: const Color(0xFF4E634B),
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child: MaterialApp(
+        title: 'Court Finder',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B8E72)),
+          useMaterial3: true,
         ),
-        useMaterial3: true,
-        fontFamily: 'Poppins',
+        home: LoginPage(),
+        debugShowCheckedModeBanner: false,
       ),
-      
-      home: const ComplaintScreen(), 
+    );
+  }
+}
+
+class MainPage extends StatefulWidget {
+  final UserEntry? user;
+  const MainPage({super.key, this.user});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int _selectedIndex = 2;
+
+  @override
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    final sessionCookie = request.cookies.values
+        .firstWhere(
+            (cookie) => cookie.name == 'sessionid', 
+            orElse: () => request.cookies.values.firstWhere(
+                (c) => c.name == 'csrftoken', 
+                orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
+                
+            )
+        )
+        .value;
+        
+
+    final List<Widget> pages = [
+      const GameSchedulerPage(),
+      widget.user != null
+        ? ManageCourtScreen(user: widget.user!)
+        : const PlaceholderPage(title: 'Manage Court'),
+      widget.user != null
+        ? MyHomePage(user: widget.user!)
+        : const PlaceholderPage(title: 'Finder'),
+      const BlogPage(),
+      const PlaceholderPage(title: 'Complaint'),
+    ];
+
+    return Scaffold(
+      body: IndexedStack(index: _selectedIndex, children: pages),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF6B8E72),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.event, 'Event', 0),
+              _buildNavItem(Icons.edit, 'Manage', 1),
+              _buildCenterLogo(),
+              _buildNavItem(Icons.article, 'Blog', 3),
+              _buildNavItem(Icons.comment, 'Complaint', 4),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 28),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCenterLogo() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = 2;
+        });
+      },
+      child: Transform.translate(
+        offset: const Offset(0, -10),
+        child: Container(
+          width: 65,
+          height: 65,
+          decoration: BoxDecoration(
+            color: const Color(0xFF4A6B4E),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ClipOval(
+              child: Image.asset(
+                'static/images/cflogo2.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                    size: 35,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PlaceholderPage extends StatelessWidget {
+  final String title;
+
+  const PlaceholderPage({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: const Color(0xFF6B8E72),
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: Text(
+          '$title Page',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }
