@@ -1,7 +1,8 @@
-import 'package:court_finder_mobile/screens/login.dart';
+
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:court_finder_mobile/screens/welcome_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
           .copyWith(secondary: Colors.blueAccent[400]),
         ),
-        home: LoginPage(),
+        home: WelcomePage(),
       ),
     );
   }

@@ -30,7 +30,6 @@ class _MyHomePageState extends State<MyHomePage>{
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
        drawer: LeftDrawer(user: user),
-
       // ============================ BODY ============================
       body: Column(
         children: [
@@ -41,9 +40,6 @@ class _MyHomePageState extends State<MyHomePage>{
           _buildCourtPlaceholder(),
         ],
       ),
-
-      // ======================= BOTTOM NAV BAR =======================
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -228,44 +224,6 @@ class _MyHomePageState extends State<MyHomePage>{
             style: TextStyle(color: Colors.grey),
           ),
         ),
-      ),
-    );
-  }
-
-  // ===================== BOTTOM NAVIGATION ========================
-  Widget _buildBottomNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6CA06E),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navButton(Icons.event, "Event", () {}),
-          _navButton(Icons.manage_accounts, "Manage", () {}),
-          _navButton(Icons.location_on, "Finder", () {}),
-          _navButton(Icons.article, "Blog", () {}),
-          _navButton(Icons.report, "Complaint", () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ],
       ),
     );
   }

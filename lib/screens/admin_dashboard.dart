@@ -72,12 +72,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    const green = Color(0xFF3F6E48);
+    const green = Color(0xFF6CA06E);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Manage Users"),
+        title: const Text(
+          "Manage Users",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: green,
       ),
 
@@ -99,7 +104,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           );
         },
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -170,18 +174,45 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(flex: 2, child: Text(user.username)),
-          Expanded(flex: 3, child: Text(user.email)),
-          Expanded(flex: 2, child: Text(user.dateJoined)),
+
+          // NAME
+          Expanded(
+            flex: 2,
+            child: Text(
+              user.username,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+
+          // EMAIL
+          Expanded(
+            flex: 3,
+            child: Text(
+              user.email,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+
+          // JOINED
+          Expanded(
+            flex: 2,
+            child: Text(
+              user.dateJoined,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
 
           // STATUS BADGE
           Expanded(
             flex: 2,
             child: Center(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: user.isActive
                       ? Colors.green.shade100
@@ -193,90 +224,59 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   style: TextStyle(
                     color: user.isActive ? Colors.green : Colors.red,
                     fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
               ),
             ),
           ),
 
-          // ACTION BUTTONS
+          // ACTION BUTTONS (WRAP AVOID OVERFLOW)
           Expanded(
-            flex: 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            flex: 3,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 4,
               children: [
-                // BAN / UNBAN BUTTON
+
+                // BAN / UNBAN
                 GestureDetector(
                   onTap: () => _banUser(user.email),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.brown.shade400,
-                      borderRadius: BorderRadius.circular(16),
+                      color: user.isActive
+                          ? Colors.brown.shade400
+                          : Colors.green.shade600,
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
                       user.isActive ? "Ban" : "Unban",
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 ),
 
-                // DELETE BUTTON
+                // DELETE
                 GestureDetector(
                   onTap: () => _deleteUser(user.email),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.red.shade600,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Text("Delete",
-                        style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-    // ===================== BOTTOM NAVIGATION ========================
-  Widget _buildBottomNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6CA06E),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _navButton(Icons.event, "Event", () {}),
-          _navButton(Icons.manage_accounts, "Manage", () {}),
-          _navButton(Icons.location_on, "Finder", () {}),
-          _navButton(Icons.article, "Blog", () {}),
-          _navButton(Icons.report, "Complaint", () {}),
-        ],
-      ),
-    );
-  }
-
-  Widget _navButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );

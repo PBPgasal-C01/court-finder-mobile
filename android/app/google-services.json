@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "297845326726",
+    "project_id": "court-finder-mobile",
+    "storage_bucket": "court-finder-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297845326726:android:8c508a71a0d589eca52207",
+        "android_client_info": {
+          "package_name": "com.example.court_finder_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "297845326726-dqqu7eo78tcudntclan7htkncprm0ipr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.court_finder_mobile",
+            "certificate_hash": "d232c429b6d4eb007df53e49017b667547a67ff4"
+          }
+        },
+        {
+          "client_id": "297845326726-f99v0ir84dr7mtmci9mnklj66msc0839.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF8bR9Dbbf3OeeBfQrUtpVrE5v03X4zo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "297845326726-f99v0ir84dr7mtmci9mnklj66msc0839.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
