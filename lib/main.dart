@@ -8,6 +8,9 @@ import 'screens/game-scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
 import 'screens/manage-court/manage_court_screen.dart';
 
+import 'package:court_finder_mobile/screens/report/menu_complain.dart'; //
+import 'package:court_finder_mobile/screens/report/menu_admin_complaint.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -70,7 +73,11 @@ class _MainPageState extends State<MainPage> {
         ? MyHomePage(user: widget.user!)
         : const PlaceholderPage(title: 'Finder'),
       const BlogPage(),
-      const PlaceholderPage(title: 'Complaint'),
+      widget.user == null
+          ? const PlaceholderPage(title: 'Report')
+          : (widget.user!.isSuperuser
+              ? const AdminHomeScreen()
+              : const ComplaintScreen()),
     ];
 
     return Scaffold(
@@ -92,7 +99,7 @@ class _MainPageState extends State<MainPage> {
               _buildNavItem(Icons.edit, 'Manage', 1),
               _buildCenterLogo(),
               _buildNavItem(Icons.article, 'Blog', 3),
-              _buildNavItem(Icons.comment, 'Complaint', 4),
+              _buildNavItem(Icons.comment, 'Report', 4),
             ],
           ),
         ),

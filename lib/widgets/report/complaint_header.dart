@@ -32,10 +32,10 @@ class ComplaintHeader extends StatelessWidget {
             children: [
               const Icon(Icons.sort, color: Colors.white, size: 24),
               Container(
-                width: 30,
-                height: 30,
+                width: 35,
+                height: 35,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                   image: const DecorationImage(
                     image: NetworkImage('https://i.pravatar.cc/150?img=11'),
                     fit: BoxFit.cover,

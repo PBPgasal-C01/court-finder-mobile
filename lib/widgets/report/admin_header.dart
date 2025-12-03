@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AdminHeader extends StatelessWidget {
   const AdminHeader({super.key});
 
-  final Color primaryGreen = const Color(0xFF6B8E72);
+  final Color primaryGreen = const Color(0xFF7FA580);
 
   @override
   Widget build(BuildContext context) {

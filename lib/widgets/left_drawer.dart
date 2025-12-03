@@ -82,7 +82,7 @@ class LeftDrawer extends StatelessWidget {
 
             _drawerItem(
               icon: Icons.report_gmailerrorred_outlined,
-              label: "Complaint",
+              label: "Report",
               onTap: () {
                 // TODO: Navigate to Complaint Page
               },
