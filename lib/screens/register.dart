@@ -48,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   print("FORM IS VALID - CONTINUING");
 
-  final url = Uri.parse("https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/register-flutter/"); 
+  final url = Uri.parse("http://localhost:8000/auth/register-flutter/"); 
 
   print("SENDING MULTIPART REQUEST...");
 

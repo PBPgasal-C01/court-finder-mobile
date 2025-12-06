@@ -37,7 +37,7 @@
 
 ## 🔗 Link PWS
 
-https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id
+http://localhost:8000
 /
 
 ## 🎨 Link Design

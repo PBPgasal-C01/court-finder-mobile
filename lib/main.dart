@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import 'models/user_entry.dart';
 import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
-import 'screens/game-scheduler/game_scheduler_page.dart';
+import 'screens/game_scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
+import 'widgets/left_drawer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,20 +37,27 @@ class MyApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   final UserEntry? user;
-  const MainPage({super.key, this.user});
+  final int initialIndex;
+  const MainPage({super.key, this.user, this.initialIndex = 2});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 2; // Default ke Finder (tengah)
+  late int _selectedIndex; // Default ke Finder (tengah)
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  } 
 
   @override
   Widget build(BuildContext context) {
     // Build pages list dengan user data
     final List<Widget> _pages = [
-      const GameSchedulerPage(),
+      GameSchedulerPage(user: widget.user),
       const PlaceholderPage(title: 'Manage'),
       widget.user != null
           ? MyHomePage(user: widget.user!)
@@ -59,6 +67,13 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Court Finder", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF6B8E72),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+
       body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -86,6 +101,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildNavItem(IconData icon, String label, int index) {
+    final bool isSelected = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
         setState(() {
