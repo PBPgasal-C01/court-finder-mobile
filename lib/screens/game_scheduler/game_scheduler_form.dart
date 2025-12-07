@@ -252,8 +252,8 @@ class _GameSchedulerFormPageState extends State<GameSchedulerFormPage> {
                         // Jika Edit -> edit-flutter/<id>
                         // Jika Create -> create-flutter/
                         String url = isEdit 
-                            ? "http://localhost:8000/event_list/edit-flutter/${widget.event!.pk}/"
-                            : "http://localhost:8000/event_list/create-flutter/";
+                            ? "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/edit-flutter/${widget.event!.pk}/"
+                            : "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/create-flutter/";
 
                         try {
                           final response = await request.postJson(

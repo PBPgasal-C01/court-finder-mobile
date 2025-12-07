@@ -43,7 +43,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     }
 
     // Adjust URL as needed (localhost vs 10.0.2.2)
-    final url = "http://localhost:8000/auth/get-user"; 
+    final url = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/get-user"; 
     
     try {
       final response = await request.get(url);
@@ -73,7 +73,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     if (_userId == null) return;
     
     final endpoint = isJoining ? 'join-flutter' : 'leave-flutter';
-    final url = "http://localhost:8000/event_list/$endpoint/${widget.event.pk}/";
+    final url = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/$endpoint/${widget.event.pk}/";
 
     try {
       final response = await request.post(url, {});

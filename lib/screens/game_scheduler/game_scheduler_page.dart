@@ -49,7 +49,7 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
     // Gunakan 127.0.0.1
-    String url = 'http://localhost:8000/event_list/json/';
+    String url = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/json/';
 
     if (_showMyEventsOnly) {
       url += '?only_me=true';
