@@ -51,25 +51,27 @@ class _MainPageState extends State<MainPage> {
     final request = context.watch<CookieRequest>();
     final sessionCookie = request.cookies.values
         .firstWhere(
-            (cookie) => cookie.name == 'sessionid', 
-            orElse: () => request.cookies.values.firstWhere(
-                (c) => c.name == 'csrftoken', 
-                orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
-                
-            )
+          (cookie) => cookie.name == 'sessionid',
+          orElse: () => request.cookies.values.firstWhere(
+            (c) => c.name == 'csrftoken',
+            orElse: () => Cookie(
+              'sessionid',
+              '',
+              DateTime.now().millisecondsSinceEpoch + 3600000,
+            ),
+          ),
         )
         .value;
-        
 
     final List<Widget> pages = [
       const GameSchedulerPage(),
       widget.user != null
-        ? ManageCourtScreen(user: widget.user!)
-        : const PlaceholderPage(title: 'Manage Court'),
+          ? ManageCourtScreen(user: widget.user!)
+          : const PlaceholderPage(title: 'Manage Court'),
       widget.user != null
-        ? MyHomePage(user: widget.user!)
-        : const PlaceholderPage(title: 'Finder'),
-      const BlogPage(),
+          ? MyHomePage(user: widget.user!)
+          : const PlaceholderPage(title: 'Finder'),
+      BlogPage(user: widget.user),
       const PlaceholderPage(title: 'Complaint'),
     ];
 

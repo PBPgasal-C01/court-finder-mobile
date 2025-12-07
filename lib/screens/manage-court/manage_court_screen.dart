@@ -14,11 +14,8 @@ import 'court_detail_screen.dart';
 
 class ManageCourtScreen extends StatefulWidget {
   final UserEntry user;
-  
-  const ManageCourtScreen({
-    super.key,
-    required this.user,
-  });
+
+  const ManageCourtScreen({super.key, required this.user});
 
   @override
   State<ManageCourtScreen> createState() => _ManageCourtScreenState();
@@ -60,7 +57,12 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
         children: [
           // --- HEADER HIJAU ---
           Container(
-            padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
+            padding: const EdgeInsets.only(
+              top: 50,
+              left: 20,
+              right: 20,
+              bottom: 20,
+            ),
             decoration: BoxDecoration(
               color: primaryGreen,
               borderRadius: const BorderRadius.only(
@@ -77,7 +79,11 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                   children: [
                     Builder(
                       builder: (context) => IconButton(
-                        icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+                        icon: const Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         onPressed: () {
                           Scaffold.of(context).openDrawer();
                         },
@@ -87,22 +93,25 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                       radius: 20,
                       backgroundColor: Colors.grey,
                       child: widget.user.photo != null
-                        ? ClipOval(
-                            child: Image.network(
-                              widget.user.photo!,
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.person, color: Colors.white),
-                            ),
-                          )
-                        : const Icon(Icons.person, color: Colors.white),
+                          ? ClipOval(
+                              child: Image.network(
+                                widget.user.photo!,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                    ),
+                              ),
+                            )
+                          : const Icon(Icons.person, color: Colors.white),
                     ),
                   ],
                 ),
                 const SizedBox(height: 15),
-                
+
                 // Title & Add Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -120,7 +129,10 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                     ),
                     // Add New Button
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
@@ -129,7 +141,9 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                         onTap: () async {
                           await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const AddCourtScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const AddCourtScreen(),
+                            ),
                           );
                           _refreshCourts();
                         },
@@ -164,18 +178,20 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
-                    child: CircularProgressIndicator(
-                      color: primaryGreen,
-                    ),
+                    child: CircularProgressIndicator(color: primaryGreen),
                   );
                 }
-                
+
                 if (snapshot.hasError) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error_outline, size: 60, color: Colors.red.shade300),
+                        Icon(
+                          Icons.error_outline,
+                          size: 60,
+                          color: Colors.red.shade300,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Failed to load data',
@@ -202,9 +218,9 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                     ),
                   );
                 }
-                
+
                 final courts = snapshot.data ?? [];
-                
+
                 if (courts.isEmpty) {
                   return Center(
                     child: Column(
@@ -212,25 +228,22 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                       children: [
                         // Empty State Logo (Ganti Icon biar aman)
                         Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              color: primaryGreen.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.location_on,
-                              size: 80,
-                              color: primaryGreen,
-                            ),
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: primaryGreen.withOpacity(0.2),
+                            shape: BoxShape.circle,
                           ),
+                          child: Icon(
+                            Icons.location_on,
+                            size: 80,
+                            color: primaryGreen,
+                          ),
+                        ),
                         const SizedBox(height: 20),
                         const Text(
                           "Don't have any Court",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
                         ),
                         const SizedBox(height: 8),
                         const Text(
@@ -253,23 +266,30 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                   },
                   color: primaryGreen,
                   child: GridView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.68,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
                     ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.68,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
                     itemCount: courts.length,
                     itemBuilder: (context, index) {
                       final court = courts[index];
-                      
+
                       // --- PERBAIKAN 1: LOGIKA URL GAMBAR (WEB VS ANDROID) ---
                       // Jika Web (Chrome), pakai localhost. Jika Android, pakai 10.0.2.2.
-                      final String baseUrl = kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
-                      
+                      final String baseUrl = kIsWeb
+                          ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id'
+                          : 'http://10.0.2.2:8000';
+
                       String imageUrl;
-                      if (court.photoUrl != null && court.photoUrl!.isNotEmpty) {
+                      if (court.photoUrl != null &&
+                          court.photoUrl!.isNotEmpty) {
                         if (court.photoUrl!.startsWith('http')) {
                           imageUrl = court.photoUrl!;
                         } else {
@@ -289,7 +309,10 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                           children: [
                             // Header dengan nama dan type
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade50,
                                 borderRadius: const BorderRadius.vertical(
@@ -323,9 +346,13 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
 
                             // Tanggal dan ID
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().year.toString().substring(2)}',
@@ -350,33 +377,37 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(0),
                                 child: (imageUrl.isNotEmpty)
-                                  ? Image.network(
-                                      imageUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) => 
-                                        Container(
-                                          color: Colors.grey.shade200,
-                                          child: Icon(
-                                            Icons.sports_soccer,
-                                            size: 40,
-                                            color: Colors.grey.shade400,
-                                          ),
+                                    ? Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Container(
+                                                  color: Colors.grey.shade200,
+                                                  child: Icon(
+                                                    Icons.sports_soccer,
+                                                    size: 40,
+                                                    color: Colors.grey.shade400,
+                                                  ),
+                                                ),
+                                      )
+                                    : Container(
+                                        color: Colors.grey.shade200,
+                                        child: Icon(
+                                          Icons.sports_soccer,
+                                          size: 40,
+                                          color: Colors.grey.shade400,
                                         ),
-                                    )
-                                  : Container(
-                                      color: Colors.grey.shade200,
-                                      child: Icon(
-                                        Icons.sports_soccer,
-                                        size: 40,
-                                        color: Colors.grey.shade400,
                                       ),
-                                    ),
                               ),
                             ),
 
                             // Alamat
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               child: Text(
                                 court.address,
                                 style: const TextStyle(
@@ -390,9 +421,13 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
 
                             // Action Buttons Section
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 8,
+                              ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   // See Detail Button
                                   Expanded(
@@ -401,16 +436,24 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => CourtDetailScreen(court: court),
+                                            builder: (context) =>
+                                                CourtDetailScreen(court: court),
                                           ),
                                         );
                                       },
                                       style: OutlinedButton.styleFrom(
-                                        side: const BorderSide(color: Colors.black, width: 1),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                        side: const BorderSide(
+                                          color: Colors.black,
+                                          width: 1,
                                         ),
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
                                       ),
                                       child: const Text(
                                         'SEE DETAIL',
@@ -422,29 +465,36 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                                       ),
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(width: 8),
-                                  
+
                                   // --- PERBAIKAN 2: GANTI GAMBAR SAMPAH JADI ICON ---
                                   // Biar ga error 404 karena file 'transh.png' ga ketemu
                                   InkWell(
                                     onTap: () {
-                                      _showDeleteDialog(context, court, primaryGreen);
+                                      _showDeleteDialog(
+                                        context,
+                                        court,
+                                        primaryGreen,
+                                      );
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: Colors.red.withOpacity(0.1), // Background merah muda dikit
+                                        color: Colors.red.withOpacity(
+                                          0.1,
+                                        ), // Background merah muda dikit
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
-                                        Icons.delete_outline, // Pakai Icon bawaan Flutter
-                                        color: Colors.red, 
-                                        size: 20
+                                        Icons
+                                            .delete_outline, // Pakai Icon bawaan Flutter
+                                        color: Colors.red,
+                                        size: 20,
                                       ),
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(width: 8),
 
                                   // Edit Button (Ganti jadi Icon juga biar seragam & aman)
@@ -453,7 +503,8 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => EditCourtScreen(court: court),
+                                          builder: (context) =>
+                                              EditCourtScreen(court: court),
                                         ),
                                       );
                                       _refreshCourts();
@@ -488,12 +539,18 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Court court, Color primaryGreen) {
+  void _showDeleteDialog(
+    BuildContext context,
+    Court court,
+    Color primaryGreen,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text("Delete Court"),
           content: Text("Are you sure you want to delete '${court.name}'?"),
           actions: <Widget>[
@@ -502,38 +559,46 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
-              child: const Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              child: const Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 final request = context.read<CookieRequest>();
-                
+
                 try {
-                    final success = await _service.deleteCourt(request, court.pk);
-                    
-                    if (context.mounted) { 
-                        if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text("${court.name} deleted successfully!"),
-                                    backgroundColor: primaryGreen,
-                                ),
-                            );
-                            _refreshCourts();
-                        } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Failed to delete court. Please try again."),
-                                    backgroundColor: Colors.red,
-                                ),
-                            );
-                        }
+                  final success = await _service.deleteCourt(request, court.pk);
+
+                  if (context.mounted) {
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${court.name} deleted successfully!"),
+                          backgroundColor: primaryGreen,
+                        ),
+                      );
+                      _refreshCourts();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Failed to delete court. Please try again.",
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
+                  }
                 } catch (e) {
-                    if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Error: $e")),
-                        );
-                    }
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                  }
                 }
               },
             ),

@@ -106,7 +106,8 @@ class _LoginPageState extends State<LoginPage> {
                       // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
                       // If you using chrome,  use URL http://localhost:8000
                       final response = await request.login(
-                        "http://127.0.0.1:8000/auth/login-flutter/",
+                        // TODO
+                        "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/login-flutter/",
                         {'username': username, 'password': password},
                       );
 
@@ -115,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                         String uname = response['username'];
                         if (context.mounted) {
                           final response = await request.get(
-                            "http://127.0.0.1:8000/auth/user-flutter/",
+                            "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/",
                           );
                           UserEntry user = UserEntry.fromJson(response);
 

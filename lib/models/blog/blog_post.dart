@@ -37,7 +37,13 @@ class BlogPost {
     title: json["title"],
     author: json["author"],
     content: json["content"],
-    thumbnailUrl: json["thumbnail_url"] ?? '',
+    // Clean thumbnail URL from any whitespace, line breaks
+    thumbnailUrl: (json["thumbnail_url"] ?? '')
+        .toString()
+        .trim()
+        .replaceAll('\n', '')
+        .replaceAll('\r', '')
+        .replaceAll(' ', ''),
     createdAt: DateTime.parse(json["created_at"]),
     readingTime: json["reading_time"],
     updatedAt: json["updated_at"] != null
@@ -57,5 +63,15 @@ class BlogPost {
   };
 
   // Helper getter untuk reading time dalam menit
-  int get readingTimeMinutes => readingTime ?? 5;
+  int get readingTimeMinutes {
+    if (readingTime == null) return 5;
+    // Handle both int and double from JSON
+    if (readingTime is int) return readingTime as int;
+    if (readingTime is double) return (readingTime as double).round();
+    // Try parse if string
+    if (readingTime is String) {
+      return int.tryParse(readingTime as String) ?? 5;
+    }
+    return 5;
+  }
 }
