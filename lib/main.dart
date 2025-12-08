@@ -7,6 +7,7 @@ import 'screens/blog/blog_page.dart';
 import 'screens/game_scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
 import 'widgets/left_drawer.dart';
+import 'screens/manage-court/manage_court_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,24 +46,34 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late int _selectedIndex; // Default ke Finder (tengah)
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = widget.initialIndex;
-  } 
+  int _selectedIndex = 2;
 
   @override
   Widget build(BuildContext context) {
-    // Build pages list dengan user data
-    final List<Widget> _pages = [
-      GameSchedulerPage(user: widget.user),
-      const PlaceholderPage(title: 'Manage'),
+    final request = context.watch<CookieRequest>();
+    final sessionCookie = request.cookies.values
+        .firstWhere(
+          (cookie) => cookie.name == 'sessionid',
+          orElse: () => request.cookies.values.firstWhere(
+            (c) => c.name == 'csrftoken',
+            orElse: () => Cookie(
+              'sessionid',
+              '',
+              DateTime.now().millisecondsSinceEpoch + 3600000,
+            ),
+          ),
+        )
+        .value;
+
+    final List<Widget> pages = [
+      const GameSchedulerPage(),
+      widget.user != null
+          ? ManageCourtScreen(user: widget.user!)
+          : const PlaceholderPage(title: 'Manage Court'),
       widget.user != null
           ? MyHomePage(user: widget.user!)
           : const PlaceholderPage(title: 'Finder'),
-      const BlogPage(),
+      BlogPage(user: widget.user),
       const PlaceholderPage(title: 'Complaint'),
     ];
 
@@ -171,7 +182,6 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-// Placeholder page untuk setiap menu
 class PlaceholderPage extends StatelessWidget {
   final String title;
 
