@@ -21,7 +21,7 @@ class _BlogPageState extends State<BlogPage> {
 
   // Ganti dengan URL production Anda
   static const String _baseUrl =
-      'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/host:8000';
+      'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/blog/';
 
   @override
   void initState() {

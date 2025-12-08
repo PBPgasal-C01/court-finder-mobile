@@ -48,7 +48,7 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
   };
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    // Gunakan 127.0.0.1
+    // Gunakan URL yang sesuai (localhost/10.0.2.2/deploy url)
     String url = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/json/';
 
     if (_showMyEventsOnly) {
@@ -217,7 +217,6 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
                     }),
                   ],
                 ),
-                // ===============================================
               ],
             ),
           ),
@@ -254,17 +253,15 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
                       children: [
                         // MENGGUNAKAN LOGO APLIKASI
                         Image.asset(
-                          'static/images/cflogo2.png', // Pastikan path ini benar di pubspec.yaml
+                          'static/images/cflogo2.png', 
                           width: 130, 
                           height: 130,
                           fit: BoxFit.contain,
-                          // Fallback jika gambar tidak ditemukan
                           errorBuilder: (context, error, stackTrace) {
                             return const Icon(Icons.event_busy, size: 100, color: Colors.grey);
                           },
                         ),
                         const SizedBox(height: 20),
-                        // Pesan kosong yang informatif
                         Text(
                           _searchQuery.isNotEmpty
                               ? "There are no events found for '$_searchQuery'"
@@ -281,7 +278,10 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 0.85, 
+                      // --- PERBAIKAN DI SINI ---
+                      // Ubah 0.85 menjadi 0.62 agar kartu lebih tinggi
+                      // sehingga tombol tidak terdorong keluar area (unclickable)
+                      childAspectRatio: 0.58, 
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (_, index) {
