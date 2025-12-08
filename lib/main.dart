@@ -8,8 +8,8 @@ import 'screens/game-scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
 import 'screens/manage-court/manage_court_screen.dart';
 
-import 'package:court_finder_mobile/screens/report/menu_complain.dart'; //
-import 'package:court_finder_mobile/screens/report/menu_admin_complaint.dart';
+import 'package:court_finder_mobile/screens/complain/menu_complaint.dart'; //
+import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart';
 
 void main() {
   runApp(const MyApp());
