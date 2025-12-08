@@ -5,6 +5,7 @@ import '/models/user_entry.dart';
 import '/screens/login.dart';
 import '/screens/user_profile.dart';
 import '/screens/admin_dashboard.dart';
+import 'package:court_finder_mobile/main.dart';
 
 class LeftDrawer extends StatelessWidget {
   final UserEntry user;
@@ -116,7 +117,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.event_outlined,
               label: "Event",
               onTap: () {
-                // TODO: Navigate to Event Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user, 
+                      initialIndex: 0, // 0 = Index untuk Event/GameScheduler
+                    ),
+                  ),
+                ); 
               },
             ),
 

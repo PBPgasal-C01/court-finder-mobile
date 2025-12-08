@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import 'models/user_entry.dart';
 import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
-import 'screens/game-scheduler/game_scheduler_page.dart';
+import 'screens/game_scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
+import 'widgets/left_drawer.dart';
 import 'screens/manage-court/manage_court_screen.dart';
 
 void main() {
@@ -37,7 +38,8 @@ class MyApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   final UserEntry? user;
-  const MainPage({super.key, this.user});
+  final int initialIndex;
+  const MainPage({super.key, this.user, this.initialIndex = 2});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -76,7 +78,14 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: pages),
+      appBar: AppBar(
+        title: const Text("Court Finder", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF6B8E72),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF6B8E72),
@@ -103,6 +112,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildNavItem(IconData icon, String label, int index) {
+    final bool isSelected = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
         setState(() {
