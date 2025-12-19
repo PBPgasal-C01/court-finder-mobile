@@ -8,13 +8,11 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 class ApiService {
   static const String baseUrl = 'http://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/courts';
 
-  // Headers untuk authenticated requests
   Map<String, String> _getHeaders({String? token}) {
     final headers = {
       'Content-Type': 'application/json',
     };
 
-    // Jika ada authentication token (session/JWT)
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
     }
@@ -26,18 +24,12 @@ class ApiService {
     try {
       print("Sending request to: $baseUrl/api/search/");
 
-      // PERBAIKAN: Gunakan postJson + jsonEncode
-      // postJson akan otomatis mengatur header 'Content-Type: application/json'
-      // sehingga tidak akan error 415, dan bisa menerima List.
       final response = await request.postJson(
           '$baseUrl/api/search/',
           jsonEncode(filter.toRequestBody())
       );
 
-      // Debugging
-      print("Raw Server Response: $response");
 
-      // Validasi response
       if (response != null && response['courts'] != null) {
         final List<dynamic> courtsJson = response['courts'];
         return courtsJson.map((json) => Court.fromJson(json)).toList();
@@ -50,9 +42,8 @@ class ApiService {
     }
   }
 
-  // 2. Update getNearbyCourts juga (karena dia memanggil searchCourts)
   Future<List<Court>> getNearbyCourts(
-      CookieRequest request, // <--- Tambah Parameter ini
+      CookieRequest request,
       double latitude,
       double longitude,
       ) async {
@@ -60,7 +51,6 @@ class ApiService {
       latitude: latitude,
       longitude: longitude,
     );
-    // Oper request ke searchCourts
     return searchCourts(request, filter);
   }
 
@@ -118,17 +108,12 @@ class ApiService {
     }
   }
 
-  // Toggle bookmark wrapper
   Future<bool> toggleBookmark(CookieRequest request, String courtId) async {
-    // Pastikan URL nyambung dengan benar (ada slash di api/bookmark/)
     final url = '${baseUrl}/api/bookmark/$courtId/';
 
     try {
-      // Kirim POST (Apapun yang terjadi, kirim POST)
       final response = await request.post(url, {});
 
-      // Backend akan membalas dengan JSON: {"bookmarked": true/false}
-      // Kita kembalikan nilai bool itu ke UI
       if (response['bookmarked'] != null) {
         return response['bookmarked'];
       }
@@ -140,20 +125,12 @@ class ApiService {
     }
   }
 
-  // 3. Update getBookmarkedCourts juga
   Future<List<Court>> getBookmarkedCourts(CookieRequest request, {CourtFilter? filter}) async {
-    // Logika:
-    // 1. Ambil filter yang dikirim dari UI (misal user pilih "Futsal" & "Indoor").
-    // 2. Kalau null (user gak filter apa2), bikin CourtFilter kosong.
-    // 3. Apapun yang terjadi, PAKSA 'bookmarkedOnly' jadi true dengan .copyWith()
-
     final effectiveFilter = (filter ?? CourtFilter()).copyWith(bookmarkedOnly: true);
 
-    // Kirim ke searchCourts (yang sudah kita fix pakai postJson tadi)
     return searchCourts(request, effectiveFilter);
   }
 
-  // Geocode address (convert address to lat/lon)
   Future<Map<String, double>?> geocodeAddress(String address) async {
     try {
       final response = await http.post(

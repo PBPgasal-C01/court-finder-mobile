@@ -1,21 +1,20 @@
 import 'province.dart';
 
-// models/court.dart
 class Court {
-  final String id; // UUID dari Django
+  final String id;
   final String name;
-  final String courtType; // court_type dari Django
-  final String locationType; // indoor/outdoor
+  final String courtType;
+  final String locationType;
   final double pricePerHour;
   final String address;
-  final List<Province> provinces; // ManyToMany
+  final List<Province> provinces;
   final double latitude;
   final double longitude;
   final String phoneNumber;
   final String? description;
   final List<String> facilities;
   final bool isBookmarked;
-  final double? distance; // dalam km
+  final double? distance;
 
   Court({
     required this.id,
