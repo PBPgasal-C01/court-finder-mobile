@@ -6,6 +6,7 @@ import '/screens/login.dart';
 import '/screens/user_profile.dart';
 import '/screens/admin_dashboard.dart';
 import '/screens/court-finder/court_finder_screen.dart';
+import 'package:court_finder_mobile/main.dart';
 
 class LeftDrawer extends StatelessWidget {
   final UserEntry user;
@@ -120,7 +121,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.event_outlined,
               label: "Event",
               onTap: () {
-                // TODO: Navigate to Event Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user, 
+                      initialIndex: 0, // 0 = Index untuk Event/GameScheduler
+                    ),
+                  ),
+                ); 
               },
             ),
 
@@ -146,7 +156,7 @@ class LeftDrawer extends StatelessWidget {
               label: "Logout",
               onTap: () async {
                 await request.logout(
-                  "http://127.0.0.1:8000/auth/logout-flutter/",
+                  "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/",
                 );
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(

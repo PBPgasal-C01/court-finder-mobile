@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 import 'models/user_entry.dart';
 import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
-import 'screens/game-scheduler/game_scheduler_page.dart';
+import 'screens/game_scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
+import 'widgets/left_drawer.dart';
 import 'screens/manage-court/manage_court_screen.dart';
 import 'screens/court-finder/court_finder_screen.dart';
 
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   final UserEntry? user;
-  const MainPage({super.key, this.user});
+  final int initialIndex;
+  const MainPage({super.key, this.user, this.initialIndex = 2});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -52,15 +54,17 @@ class _MainPageState extends State<MainPage> {
     final request = context.watch<CookieRequest>();
     final sessionCookie = request.cookies.values
         .firstWhere(
-            (cookie) => cookie.name == 'sessionid', 
-            orElse: () => request.cookies.values.firstWhere(
-                (c) => c.name == 'csrftoken', 
-                orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
-                
-            )
+          (cookie) => cookie.name == 'sessionid',
+          orElse: () => request.cookies.values.firstWhere(
+            (c) => c.name == 'csrftoken',
+            orElse: () => Cookie(
+              'sessionid',
+              '',
+              DateTime.now().millisecondsSinceEpoch + 3600000,
+            ),
+          ),
         )
         .value;
-        
 
     final List<Widget> pages = [
       const GameSchedulerPage(),
@@ -69,11 +73,24 @@ class _MainPageState extends State<MainPage> {
         : const PlaceholderPage(title: 'Manage Court'),
       const CourtFinderScreen(),
       const BlogPage(),
+          ? ManageCourtScreen(user: widget.user!)
+          : const PlaceholderPage(title: 'Manage Court'),
+      widget.user != null
+          ? MyHomePage(user: widget.user!)
+          : const PlaceholderPage(title: 'Finder'),
+      BlogPage(user: widget.user),
       const PlaceholderPage(title: 'Complaint'),
     ];
 
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: pages),
+      appBar: AppBar(
+        title: const Text("Court Finder", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF6B8E72),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF6B8E72),
@@ -100,6 +117,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildNavItem(IconData icon, String label, int index) {
+    final bool isSelected = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
         setState(() {
