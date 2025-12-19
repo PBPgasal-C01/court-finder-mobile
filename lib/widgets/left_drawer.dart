@@ -5,6 +5,7 @@ import '/models/user_entry.dart';
 import '/screens/login.dart';
 import '/screens/user_profile.dart';
 import '/screens/admin_dashboard.dart';
+import '/screens/court-finder/court_finder_screen.dart';
 import 'package:court_finder_mobile/main.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -101,7 +102,10 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.location_on_outlined,
               label: "Finder",
               onTap: () {
-                // TODO: Navigate to Finder Page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CourtFinderScreen()),
+                );
               },
             ),
 

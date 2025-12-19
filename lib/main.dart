@@ -8,6 +8,7 @@ import 'screens/game_scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
 import 'widgets/left_drawer.dart';
 import 'screens/manage-court/manage_court_screen.dart';
+import 'screens/court-finder/court_finder_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -68,6 +69,10 @@ class _MainPageState extends State<MainPage> {
     final List<Widget> pages = [
       const GameSchedulerPage(),
       widget.user != null
+        ? ManageCourtScreen(user: widget.user!)
+        : const PlaceholderPage(title: 'Manage Court'),
+      const CourtFinderScreen(),
+      const BlogPage(),
           ? ManageCourtScreen(user: widget.user!)
           : const PlaceholderPage(title: 'Manage Court'),
       widget.user != null
