@@ -7,6 +7,7 @@ import 'screens/blog/blog_page.dart';
 import 'screens/game-scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
 import 'screens/manage-court/manage_court_screen.dart';
+import 'screens/court-finder/court_finder_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,9 +67,7 @@ class _MainPageState extends State<MainPage> {
       widget.user != null
         ? ManageCourtScreen(user: widget.user!)
         : const PlaceholderPage(title: 'Manage Court'),
-      widget.user != null
-        ? MyHomePage(user: widget.user!)
-        : const PlaceholderPage(title: 'Finder'),
+      const CourtFinderScreen(),
       const BlogPage(),
       const PlaceholderPage(title: 'Complaint'),
     ];
