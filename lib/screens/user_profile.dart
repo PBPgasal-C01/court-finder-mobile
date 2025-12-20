@@ -2,6 +2,7 @@ import 'package:court_finder_mobile/screens/menu.dart';
 import 'package:flutter/material.dart';
 import '../models/user_entry.dart';
 import 'edit_profile.dart';
+import '../main.dart';
 
 class ProfilePage extends StatelessWidget {
   final UserEntry user;
@@ -35,13 +36,12 @@ class ProfilePage extends StatelessWidget {
             left: 20,
             child: GestureDetector(
               onTap: () => Navigator.pushReplacement(
-                            context, 
+                            context,
                             MaterialPageRoute(
-                                builder: (_) => MyHomePage(
-                                  user: user
-                                ),
-                              ),
+                              builder: (_) =>
+                                  MainPage(user: user, initialIndex: 0),
                             ),
+                          ),
               child: Container(
                 width: 50,
                 height: 50,

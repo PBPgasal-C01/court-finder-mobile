@@ -103,7 +103,8 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => MyHomePage(user: user),
+            builder: (_) =>
+                MainPage(user: user, initialIndex: 0),
           ),
         );
       } else {
