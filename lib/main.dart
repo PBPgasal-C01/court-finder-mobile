@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B8E72)),
           useMaterial3: true,
         ),
-        home: LoginPage(),
+        home: WelcomePage(),
         debugShowCheckedModeBanner: false,
       ),
     );
