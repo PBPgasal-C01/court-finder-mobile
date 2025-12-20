@@ -2,21 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
+import '../../models/blog/blog_post.dart';
 
-class BlogFormPage extends StatefulWidget {
-  const BlogFormPage({super.key});
+class BlogEditPage extends StatefulWidget {
+  final BlogPost post;
+
+  const BlogEditPage({super.key, required this.post});
 
   @override
-  State<BlogFormPage> createState() => _BlogFormPageState();
+  State<BlogEditPage> createState() => _BlogEditPageState();
 }
 
-class _BlogFormPageState extends State<BlogFormPage> {
+class _BlogEditPageState extends State<BlogEditPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _authorController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
-  final TextEditingController _thumbnailController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _authorController;
+  late final TextEditingController _contentController;
+  late final TextEditingController _thumbnailController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill with existing data
+    _titleController = TextEditingController(text: widget.post.title);
+    _authorController = TextEditingController(text: widget.post.author);
+    _contentController = TextEditingController(text: widget.post.content);
+    _thumbnailController = TextEditingController(
+      text: widget.post.thumbnailUrl,
+    );
+  }
 
   @override
   void dispose() {
@@ -109,7 +124,7 @@ class _BlogFormPageState extends State<BlogFormPage> {
           Icon(Icons.edit, color: Colors.white),
           SizedBox(width: 8),
           Text(
-            'ADD NEW BLOG',
+            'EDIT BLOG',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -204,7 +219,7 @@ class _BlogFormPageState extends State<BlogFormPage> {
                   'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
 
               final response = await request.postJson(
-                '$baseUrl/blog/api/posts/create/',
+                '$baseUrl/blog/api/posts/${widget.post.id}/update/',
                 jsonEncode({
                   'title': _titleController.text.trim(),
                   'author': _authorController.text.trim(),
@@ -219,7 +234,7 @@ class _BlogFormPageState extends State<BlogFormPage> {
               if (response['ok'] == true) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Blog post created successfully!'),
+                    content: Text('Blog post updated successfully!'),
                     backgroundColor: Color(0xFF6B8E72),
                   ),
                 );
@@ -247,7 +262,7 @@ class _BlogFormPageState extends State<BlogFormPage> {
           }
         },
         child: const Text(
-          'SAVE',
+          'UPDATE',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
         ),
       ),

@@ -5,6 +5,8 @@ import '/models/user_entry.dart';
 import '/screens/login.dart';
 import '/screens/user_profile.dart';
 import '/screens/admin_dashboard.dart';
+import '/screens/court-finder/court_finder_screen.dart';
+import 'package:court_finder_mobile/main.dart';
 
 import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';       // Untuk User Biasa
 import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart'; // Untuk Admin
@@ -103,7 +105,10 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.location_on_outlined,
               label: "Finder",
               onTap: () {
-                // TODO: Navigate to Finder Page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CourtFinderScreen()),
+                );
               },
             ),
 
@@ -119,7 +124,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.event_outlined,
               label: "Event",
               onTap: () {
-                // TODO: Navigate to Event Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user, 
+                      initialIndex: 0, // 0 = Index untuk Event/GameScheduler
+                    ),
+                  ),
+                ); 
               },
             ),
 
@@ -166,7 +180,7 @@ class LeftDrawer extends StatelessWidget {
               label: "Logout",
               onTap: () async {
                 await request.logout(
-                  "http://127.0.0.1:8000/auth/logout-flutter/",
+                  "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/",
                 );
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
