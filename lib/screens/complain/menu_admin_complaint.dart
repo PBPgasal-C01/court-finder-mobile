@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb; 
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 // Import Model & Widget Card
 import 'package:court_finder_mobile/models/complain/complaint_entry.dart';
 import 'package:court_finder_mobile/widgets/complain/admin_complaint_card.dart';
 
 // [PENTING] Sesuaikan path import ini dengan lokasi file edit_complain.dart Anda
-import 'package:court_finder_mobile/screens/complain/edit_complain.dart'; 
+import 'package:court_finder_mobile/screens/complain/edit_complain.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -20,18 +20,16 @@ class AdminHomeScreen extends StatefulWidget {
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   final Color primaryGreen = const Color(0xFF7FA580);
   // Warna lama tidak dipakai lagi untuk tombol aktif karena diganti primaryGreen
-  // final Color processedTabColor = const Color(0xFFE8D8C1); 
+  // final Color processedTabColor = const Color(0xFFE8D8C1);
   // final Color textBrown = const Color(0xFF8D6E63);
 
-  String _selectedFilter = 'ALL'; 
+  String _selectedFilter = 'ALL';
 
   Future<List<ComplaintEntry>> fetchComplaints() async {
-    String baseUrl = kIsWeb 
-        ? "http://127.0.0.1:8000" 
-        : "http://10.0.2.2:8000";
+    String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
 
-    var url = Uri.parse('$baseUrl/complain/admin/json-flutter/'); 
-    
+    var url = Uri.parse('$baseUrl/complain/admin/json-flutter/');
+
     try {
       var response = await http.get(
         url,
@@ -48,38 +46,37 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       for (var d in data) {
         if (d != null) {
           try {
-             // Fix URL Gambar untuk Android Emulator
-             if (!kIsWeb && d['foto_url'] != null && d['foto_url'] is String) {
-               String rawUrl = d['foto_url'];
-               if (rawUrl.contains('127.0.0.1')) {
-                 d['foto_url'] = rawUrl.replaceFirst('127.0.0.1', '10.0.2.2');
-               }
-             }
+            // Fix URL Gambar untuk Android Emulator
+            if (!kIsWeb && d['foto_url'] != null && d['foto_url'] is String) {
+              String rawUrl = d['foto_url'];
+              if (rawUrl.contains('127.0.0.1')) {
+                d['foto_url'] = rawUrl.replaceFirst('127.0.0.1', '10.0.2.2');
+              }
+            }
 
-             listComplaint.add(ComplaintEntry.fromJson(d));
+            listComplaint.add(ComplaintEntry.fromJson(d));
           } catch (e) {
-             print("Gagal parsing item ini: $d | Error: $e");
+            print("Gagal parsing item ini: $d | Error: $e");
           }
         }
       }
       return listComplaint;
-
     } catch (e) {
       print("Error fetching complaints utama: $e");
-      return []; 
+      return [];
     }
   }
 
   List<ComplaintEntry> _filterData(List<ComplaintEntry> allData) {
     if (_selectedFilter == 'ALL') {
       return allData;
-    } 
+    }
     // FILTER BARU: REVIEW (Hanya In Review)
     else if (_selectedFilter == 'REVIEW') {
       return allData.where((item) {
         return item.status.toLowerCase() == 'in review';
       }).toList();
-    } 
+    }
     // FILTER UBAH NAMA: PROCESS (Hanya In Process / Ditinjau)
     else if (_selectedFilter == 'PROCESS') {
       return allData.where((item) {
@@ -87,8 +84,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         // 'in review' sudah dipisah ke tab sendiri
         return status == 'in process';
       }).toList();
-    } 
-    else if (_selectedFilter == 'DONE') {
+    } else if (_selectedFilter == 'DONE') {
       return allData.where((item) {
         return item.status.toLowerCase() == 'done';
       }).toList();
@@ -201,10 +197,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return _buildEmptyState();
                 } else {
-                  List<ComplaintEntry> filteredList = _filterData(snapshot.data!);
+                  List<ComplaintEntry> filteredList = _filterData(
+                    snapshot.data!,
+                  );
 
                   if (filteredList.isEmpty) {
-                    return _buildEmptyState(); 
+                    return _buildEmptyState();
                   }
 
                   return ListView.builder(
@@ -219,8 +217,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ComplaintDetailEditPage(
-                                complaintId: complaint.id, 
-                                complaint: complaint,      
+                                complaintId: complaint.id,
+                                complaint: complaint,
                               ),
                             ),
                           );
@@ -288,9 +286,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           width: 150,
           height: 150,
           fit: BoxFit.contain,
-          color: Colors.grey[300], 
+          color: Colors.grey[300],
           colorBlendMode: BlendMode.srcIn,
-          errorBuilder: (_,__,___) => Icon(Icons.folder_open, size: 80, color: Colors.grey[300]),
+          errorBuilder: (_, __, ___) =>
+              Icon(Icons.folder_open, size: 80, color: Colors.grey[300]),
         ),
         const SizedBox(height: 20),
         Text(
@@ -308,7 +307,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               letterSpacing: 1.0,
             ),
           ),
-        ]
+        ],
       ],
     );
   }

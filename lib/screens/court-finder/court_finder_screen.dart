@@ -31,7 +31,8 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
   // --- Controllers ---
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
-  final DraggableScrollableController _sheetController = DraggableScrollableController();
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
 
   // --- State Variables ---
   LatLng _currentPosition = LatLng(-6.2088, 106.8456); // Default Jakarta
@@ -105,12 +106,16 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
 
       // Animasi buka sheet sedikit
       if (_sheetController.isAttached) {
-        _sheetController.animateTo(0.4, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _sheetController.animateTo(
+          0.4,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lokasi tidak ditemukan")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Lokasi tidak ditemukan")));
     }
     setState(() => _isLoading = false);
   }
@@ -163,7 +168,10 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
             // PERUBAHAN DISINI:
             // Sekarang kita kirim 'activeFilter' ke fungsi getBookmarkedCourts
             // ApiService akan menggabungkan ini dengan 'bookmarkedOnly: true'
-            courts = await _apiService.getBookmarkedCourts(request, filter: activeFilter);
+            courts = await _apiService.getBookmarkedCourts(
+              request,
+              filter: activeFilter,
+            );
           }
         } else {
           // --- TAB NEARBY/ALL ---
@@ -223,13 +231,17 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
       // Feedback Snackbar kecil saja kalau sukses
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(newStatus ? 'Disimpan ke Bookmark' : 'Dihapus dari Bookmark'),
+          content: Text(
+            newStatus ? 'Disimpan ke Bookmark' : 'Dihapus dari Bookmark',
+          ),
           duration: const Duration(milliseconds: 800),
           behavior: SnackBarBehavior.floating,
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
     }
   }
 
@@ -247,7 +259,9 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
               initialCenter: _currentPosition,
               initialZoom: 15.0,
               onPositionChanged: _onMapPositionChanged, // Logic pointer geser
-              interactionOptions: const InteractionOptions(flags: InteractiveFlag.all),
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.all,
+              ),
             ),
             children: [
               TileLayer(
@@ -261,7 +275,11 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
           const Center(
             child: Padding(
               padding: EdgeInsets.only(bottom: 40.0), // Ujung pin pas di tengah
-              child: Icon(Icons.location_pin, size: 50, color: Colors.redAccent),
+              child: Icon(
+                Icons.location_pin,
+                size: 50,
+                color: Colors.redAccent,
+              ),
             ),
           ),
 
@@ -273,7 +291,11 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
               onTap: () => Navigator.pop(context),
               child: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)]),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                ),
                 child: const Icon(Icons.arrow_back, color: Colors.black87),
               ),
             ),
@@ -281,7 +303,8 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
 
           // LAYER 4: SEARCH BAR (Input Manual)
           Positioned(
-            top: MediaQuery.of(context).padding.top + 70, // Di bawah tombol back
+            top:
+                MediaQuery.of(context).padding.top + 70, // Di bawah tombol back
             left: 16,
             right: 16,
             child: Container(
@@ -289,7 +312,11 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               child: TextField(
@@ -304,7 +331,10 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                     onPressed: _showFilterSheet,
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                 ),
               ),
             ),
@@ -323,17 +353,22 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
             ),
 
           // LAYER 6: BOTTOM SHEET (Hasil Pencarian)
-          Positioned.fill(
-            child: _buildBottomSheet(),
-          ),
+          Positioned.fill(child: _buildBottomSheet()),
 
           // LAYER 7: LOADING INDICATOR
           if (_isLoading)
             Positioned(
               top: MediaQuery.of(context).padding.top + 130,
-              left: 0, right: 0,
-              child: const Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator())),
-            )
+              left: 0,
+              right: 0,
+              child: const Center(
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -358,8 +393,12 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
               Center(
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
-                  width: 40, height: 4,
-                  decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
               // Tabs (All / Bookmark)
@@ -373,13 +412,19 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
               // List Content
               Expanded(
                 child: _courts.isEmpty && !_isLoading
-                    ? Center(child: Text("Tidak ada lapangan ditemukan", style: TextStyle(color: Colors.grey.shade600)))
+                    ? Center(
+                        child: Text(
+                          "Tidak ada lapangan ditemukan",
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      )
                     : ListView.builder(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: _courts.length,
-                  itemBuilder: (context, index) => _buildCourtCard(_courts[index]),
-                ),
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: _courts.length,
+                        itemBuilder: (context, index) =>
+                            _buildCourtCard(_courts[index]),
+                      ),
               ),
             ],
           ),
@@ -410,12 +455,20 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 2, color: isSelected ? Colors.green : Colors.transparent)),
+            border: Border(
+              bottom: BorderSide(
+                width: 2,
+                color: isSelected ? Colors.green : Colors.transparent,
+              ),
+            ),
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.green : Colors.grey),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.green : Colors.grey,
+            ),
           ),
         ),
       ),
@@ -423,18 +476,31 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
   }
 
   Widget _buildCourtCard(Court court) {
-    final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final formatCurrency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
 
     return InkWell(
       onTap: () => _showCourtDetails(court),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // Padding disesuaikan
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ), // Padding disesuaikan
         // height: 110, // Hapus height fix agar flexibel mengikuti isi teks
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start, // Rata atas
@@ -447,35 +513,55 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                 children: [
                   // Badge Tipe Lapangan
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(6)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                     child: Text(
-                        court.courtTypeDisplay,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue.shade800)
+                      court.courtTypeDisplay,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade800,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
 
                   // Nama Lapangan
                   Text(
-                      court.name,
-                      maxLines: 2, // Izinkan 2 baris kalau nama panjang
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+                    court.name,
+                    maxLines: 2, // Izinkan 2 baris kalau nama panjang
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                   const SizedBox(height: 4),
 
                   // Alamat
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                            court.address,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)
+                          court.address,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ),
                     ],
@@ -484,8 +570,12 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
 
                   // Harga
                   Text(
-                      "${formatCurrency.format(court.pricePerHour)} / jam",
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 14)
+                    "${formatCurrency.format(court.pricePerHour)} / jam",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -516,7 +606,8 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FilterBottomSheet(currentFilter: _filter, provinces: _provinces),
+      builder: (context) =>
+          FilterBottomSheet(currentFilter: _filter, provinces: _provinces),
     );
 
     if (result != null) {
@@ -526,11 +617,16 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
   }
 
   void _showCourtDetails(Court court) {
-    final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final formatCurrency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Supaya bisa full screen/tinggi menyesuaikan konten
+      isScrollControlled:
+          true, // Supaya bisa full screen/tinggi menyesuaikan konten
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => DraggableScrollableSheet(
@@ -621,7 +717,9 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                court.phoneNumber.isNotEmpty ? court.phoneNumber : "-",
+                                court.phoneNumber.isNotEmpty
+                                    ? court.phoneNumber
+                                    : "-",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey.shade700,
@@ -639,7 +737,9 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                                 style: TextStyle(
                                   fontSize: 20, // Besar sesuai screenshot
                                   fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF698C6A), // Warna Hijau Web Django kamu
+                                  color: const Color(
+                                    0xFF698C6A,
+                                  ), // Warna Hijau Web Django kamu
                                 ),
                               ),
                               Text(
@@ -670,30 +770,40 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                       const SizedBox(height: 12),
                       court.facilities.isNotEmpty
                           ? Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: court.facilities.map((facility) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade50, // Background hijau muda
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              facility,
+                              spacing: 8.0,
+                              runSpacing: 8.0,
+                              children: court.facilities.map((facility) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors
+                                        .green
+                                        .shade50, // Background hijau muda
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    facility,
+                                    style: TextStyle(
+                                      color: Colors
+                                          .green
+                                          .shade800, // Teks hijau tua
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            )
+                          : Text(
+                              "No facilities listed.",
                               style: TextStyle(
-                                color: Colors.green.shade800, // Teks hijau tua
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade500,
+                                fontStyle: FontStyle.italic,
                               ),
                             ),
-                          );
-                        }).toList(),
-                      )
-                          : Text(
-                        "No facilities listed.",
-                        style: TextStyle(color: Colors.grey.shade500, fontStyle: FontStyle.italic),
-                      ),
 
                       const SizedBox(height: 24),
 
@@ -708,7 +818,8 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        court.description != null && court.description!.isNotEmpty
+                        court.description != null &&
+                                court.description!.isNotEmpty
                             ? court.description!
                             : "No description available.",
                         style: TextStyle(
@@ -737,7 +848,9 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Login Diperlukan"),
-        content: const Text("Silakan login terlebih dahulu untuk menyimpan bookmark."),
+        content: const Text(
+          "Silakan login terlebih dahulu untuk menyimpan bookmark.",
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         actions: [
           // Tombol Cancel

@@ -45,8 +45,6 @@ class MainPage extends StatefulWidget {
   final int initialIndex;
   const MainPage({super.key, this.user, this.initialIndex = 2});
 
-  
-
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -74,33 +72,29 @@ class _MainPageState extends State<MainPage> {
     final List<Widget> pages = [
       const GameSchedulerPage(),
       widget.user != null
-        ? ManageCourtScreen(user: widget.user!)
-        : const PlaceholderPage(title: 'Manage Court'),
+          ? ManageCourtScreen(user: widget.user!)
+          : const PlaceholderPage(title: 'Manage Court'),
       const CourtFinderScreen(),
       const BlogPage(),
       widget.user == null
           ? const PlaceholderPage(title: 'Report')
           : (widget.user!.isSuperuser
-              ? const AdminHomeScreen()
-              : const ComplaintScreen()),
-          ? ManageCourtScreen(user: widget.user!)
-          : const PlaceholderPage(title: 'Manage Court'),
-      widget.user != null
-          ? MyHomePage(user: widget.user!)
-          : const PlaceholderPage(title: 'Finder'),
-      BlogPage(user: widget.user),
-      const PlaceholderPage(title: 'Complaint'),
+                ? const AdminHomeScreen()
+                : const ComplaintScreen()),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Court Finder", style: TextStyle(color: Colors.white)),
+        title: const Text(
+          "Court Finder",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF6B8E72),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
 
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body: IndexedStack(index: _selectedIndex, children: pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF6B8E72),

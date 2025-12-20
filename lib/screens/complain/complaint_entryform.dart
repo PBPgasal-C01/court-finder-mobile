@@ -23,7 +23,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
   final Color _headerColor = const Color(0xFF3F5940);
   final Color _inputBoxColor = const Color(0xFFF3F3F3);
 
-  XFile? _selectedImage; 
+  XFile? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
   bool _isLoading = false;
@@ -45,9 +45,9 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal memilih gambar: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal memilih gambar: $e")));
     }
   }
 
@@ -76,7 +76,10 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF3F5940)),
+              leading: const Icon(
+                Icons.photo_library,
+                color: Color(0xFF3F5940),
+              ),
               title: const Text("Galeri"),
               onTap: () {
                 Navigator.pop(context);
@@ -91,18 +94,14 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      setState(() { _isLoading = true; });
+      setState(() {
+        _isLoading = true;
+      });
 
       final request = context.read<CookieRequest>();
-      
+
       try {
-        String baseUrl;
-        // Penyesuaian URL untuk Web vs Android Emulator
-        if (kIsWeb) {
-          baseUrl = "http://127.0.0.1:8000";
-        } else {
-          baseUrl = "http://10.0.2.2:8000"; // IP Loopback Android Emulator
-        }
+        String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
         final String url = '$baseUrl/complain/create-flutter/';
 
         String? base64Image;
@@ -114,28 +113,44 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
         }
 
         final response = await request.postJson(
-            url,
-            jsonEncode(<String, dynamic>{
-                'court_name': _courtNameController.text,
-                'masalah': _masalahController.text,
-                'deskripsi': _deskripsiController.text,
-                'foto': base64Image,
-            }),
+          url,
+          jsonEncode(<String, dynamic>{
+            'court_name': _courtNameController.text,
+            'masalah': _masalahController.text,
+            'deskripsi': _deskripsiController.text,
+            'foto': base64Image,
+          }),
         );
 
         if (response['status'] == 'success') {
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Laporan berhasil disimpan!"), backgroundColor: Colors.green));
-            Navigator.pop(context, true);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Laporan berhasil disimpan!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context, true);
         } else {
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Gagal: ${response['message']}"), backgroundColor: Colors.red));
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Gagal: ${response['message']}"),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
       } finally {
-        if (mounted) { setState(() { _isLoading = false; }); }
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -214,17 +229,37 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                         decoration: BoxDecoration(
                           color: _inputBoxColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!, width: 2, style: BorderStyle.solid),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 2,
+                            style: BorderStyle.solid,
+                          ),
                         ),
                         child: _selectedImage == null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.add_photo_alternate, size: 60, color: Colors.grey[400]),
+                                  Icon(
+                                    Icons.add_photo_alternate,
+                                    size: 60,
+                                    color: Colors.grey[400],
+                                  ),
                                   const SizedBox(height: 10),
-                                  Text("Tap to upload image", style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                                  Text(
+                                    "Tap to upload image",
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
                                   const SizedBox(height: 5),
-                                  Text("Camera or Gallery", style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                                  Text(
+                                    "Camera or Gallery",
+                                    style: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ],
                               )
                             : Stack(
@@ -233,13 +268,16 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                                     borderRadius: BorderRadius.circular(12),
                                     child: kIsWeb
                                         ? Image.network(
-                                            _selectedImage!.path, // Web pakai Image.network (Blob URL)
+                                            _selectedImage!
+                                                .path, // Web pakai Image.network (Blob URL)
                                             width: double.infinity,
                                             height: 200,
                                             fit: BoxFit.cover,
                                           )
                                         : Image.file(
-                                            File(_selectedImage!.path), // Mobile pakai Image.file
+                                            File(
+                                              _selectedImage!.path,
+                                            ), // Mobile pakai Image.file
                                             width: double.infinity,
                                             height: 200,
                                             fit: BoxFit.cover,
@@ -249,11 +287,22 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                                     top: 8,
                                     right: 8,
                                     child: GestureDetector(
-                                      onTap: () { setState(() { _selectedImage = null; }); },
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedImage = null;
+                                        });
+                                      },
                                       child: Container(
                                         padding: const EdgeInsets.all(6),
-                                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                                        child: const Icon(Icons.close, color: Colors.white, size: 20),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -266,18 +315,28 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () { Navigator.pop(context); },
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFF8D7DA),
                               foregroundColor: const Color(0xFF721C24),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
-                                side: const BorderSide(color: Color(0xFFF5C6CB)),
+                                side: const BorderSide(
+                                  color: Color(0xFFF5C6CB),
+                                ),
                               ),
                               elevation: 0,
                             ),
-                            child: const Text("CANCEL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            child: const Text(
+                              "CANCEL",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -295,8 +354,20 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                               elevation: 0,
                             ),
                             child: _isLoading
-                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                                : const Text("SAVE", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "SAVE",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -310,6 +381,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
       ),
     );
   }
+
   // Widget _buildLabel dan _buildTextField sama seperti sebelumnya
   Widget _buildLabel(String text) {
     return Padding(

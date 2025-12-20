@@ -42,6 +42,10 @@ dependencies:
   latlong2: ^0.9.0
   geolocator: ^11.0.0
   intl: ^0.18.1
+  path: any
+  collection: any
+  equatable: any
+  flutter_map_marker_cluster: any
 
 dev_dependencies:
   flutter_test:

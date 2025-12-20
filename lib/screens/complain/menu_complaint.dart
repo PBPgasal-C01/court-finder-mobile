@@ -24,7 +24,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
     // setState akan memicu build ulang, sehingga fetchComplaints jalan lagi
     setState(() {});
     // Delay sedikit agar loading spinner terlihat natural
-    return Future.delayed(const Duration(seconds: 1)); 
+    return Future.delayed(const Duration(seconds: 1));
   }
 
   Future<List<ComplaintEntry>> fetchComplaints(CookieRequest request) async {
@@ -32,18 +32,18 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
       // 1. LOGIKA URL ADAPTIF
       String baseUrl;
       if (kIsWeb) {
-        baseUrl = 'http://127.0.0.1:8000';
+        baseUrl = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
       } else {
         baseUrl = 'http://10.0.2.2:8000';
       }
-      
+
       // Pastikan URL path sesuai dengan Django (tanpa 't' di complain)
       var url = '$baseUrl/complain/json-flutter/';
 
       print("🔍 Fetching complaints from: $url");
-      
+
       var response = await request.get(url);
-      
+
       // 2. ERROR HANDLING
       if (response is Map && response.containsKey('status')) {
         if (response['status'] == 'error') {
@@ -52,7 +52,9 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
       }
 
       if (response is! List) {
-        throw Exception("Invalid response format. Expected List, got: ${response.runtimeType}");
+        throw Exception(
+          "Invalid response format. Expected List, got: ${response.runtimeType}",
+        );
       }
 
       // 3. PARSING DATA
@@ -62,7 +64,8 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
           try {
             // Fix URL Gambar untuk Android
             if (!kIsWeb && d['foto_url'] != null) {
-              d['foto_url'] = d['foto_url'].toString()
+              d['foto_url'] = d['foto_url']
+                  .toString()
                   .replaceAll('127.0.0.1', '10.0.2.2')
                   .replaceAll('localhost', '10.0.2.2');
             }
@@ -72,9 +75,8 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
           }
         }
       }
-      
+
       return listComplaint;
-      
     } catch (e) {
       print("❌ Fetch error: $e");
       rethrow;
@@ -92,7 +94,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
         children: [
           // Header Statis (Tidak ikut scroll refresh)
           _buildHeader(request),
-          
+
           // Area Konten yang bisa di-Refresh
           Expanded(
             child: RefreshIndicator(
@@ -103,14 +105,16 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                   // State 1: Loading
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
-                  } 
+                  }
                   // State 2: Error
                   else if (snapshot.hasError) {
                     // Bungkus dengan ListView agar bisa ditarik untuk refresh saat error
                     return ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.2,
+                        ),
                         Center(
                           child: Text(
                             "Error fetching data:\n${snapshot.error}",
@@ -120,18 +124,20 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                         ),
                       ],
                     );
-                  } 
+                  }
                   // State 3: Kosong
                   else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     // Bungkus dengan ListView agar bisa ditarik untuk refresh saat kosong
                     return ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
                         _buildEmptyState(),
                       ],
                     );
-                  } 
+                  }
                   // State 4: Ada Data (Sukses)
                   else {
                     return ListView.builder(
@@ -158,54 +164,77 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                         return ComplaintCard(
                           complaint: complaint,
                           onTap: () {},
-                          
+
                           // LOGIKA DELETE YANG SINKRON
                           onDelete: () async {
                             // 1. Tampilkan dialog konfirmasi (Opsional tapi disarankan)
-                            bool confirm = await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Delete Report?'),
-                                content: const Text('Are you sure you want to delete this report?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: const Text('Cancel'),
+                            bool confirm =
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Delete Report?'),
+                                    content: const Text(
+                                      'Are you sure you want to delete this report?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                                  ),
-                                ],
-                              ),
-                            ) ?? false;
+                                ) ??
+                                false;
 
                             if (confirm) {
-                                // 2. Tentukan URL Adaptif
-                                String baseUrl = kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
-                                var url = '$baseUrl/complain/delete-flutter/${complaint.id}/'; // Gunakan PK/ID dari complaint
+                              // 2. Tentukan URL Adaptif
+                              String baseUrl = kIsWeb
+                                  ? 'http://127.0.0.1:8000'
+                                  : 'http://10.0.2.2:8000';
+                              var url =
+                                  '$baseUrl/complain/delete-flutter/${complaint.id}/'; // Gunakan PK/ID dari complaint
 
-                                // 3. Kirim Request POST
-                                try {
-                                    final response = await request.post(url, {}); // Body kosong tidak apa-apa
-                                    
-                                    // 4. Cek Hasil
-                                    if (response['status'] == 'success') {
-                                        if (!mounted) return;
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text("Report is successfully deleted"), backgroundColor: Colors.green),
-                                        );
-                                        // 5. REFRESH LIST OTOMATIS
-                                        _refreshComplaints(); 
-                                    } else {
-                                        if (!mounted) return;
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text(response['message']), backgroundColor: Colors.red),
-                                        );
-                                    }
-                                } catch (e) {
-                                    print("Error deleting: $e");
+                              // 3. Kirim Request POST
+                              try {
+                                final response = await request.post(
+                                  url,
+                                  {},
+                                ); // Body kosong tidak apa-apa
+
+                                // 4. Cek Hasil
+                                if (response['status'] == 'success') {
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Report is successfully deleted",
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                  // 5. REFRESH LIST OTOMATIS
+                                  _refreshComplaints();
+                                } else {
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(response['message']),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
                                 }
+                              } catch (e) {
+                                print("Error deleting: $e");
+                              }
                             }
                           },
                         );
