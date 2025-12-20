@@ -1,10 +1,11 @@
 import 'package:court_finder_mobile/screens/register.dart';
 import 'package:flutter/material.dart';
-import 'package:court_finder_mobile/screens/menu.dart';
+import 'package:court_finder_mobile/main.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:court_finder_mobile/models/user_entry.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:court_finder_mobile/screens/menu.dart';
 
 void main() {
   runApp(const LoginApp());
@@ -19,8 +20,9 @@ class LoginApp extends StatelessWidget {
       title: 'Login', 
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-          .copyWith(secondary: Colors.blueAccent[400]),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.blue,
+        ).copyWith(secondary: Colors.blueAccent[400]),
       ),
       home: const LoginPage(),
     );
@@ -324,13 +326,29 @@ class _LoginPageState extends State<LoginPage> {
                       );
 
                       if (request.loggedIn) {
-                        final userData = await request.get("https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/");
-                        UserEntry user = UserEntry.fromJson(userData);
+                        String message = response['message'];
+                        String uname = response['username'];
+                        if (context.mounted) {
+                          final response = await request.get(
+                            "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/",
+                          );
+                          UserEntry user = UserEntry.fromJson(response);
 
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => MyHomePage(user: user)),
-                        );
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  MainPage(user: user, initialIndex: 0),
+                            ),
+                          );
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: Text("$message Welcome, $uname."),
+                              ),
+                            );
+                        }
                       } else {
                         showDialog(
                           context: context,

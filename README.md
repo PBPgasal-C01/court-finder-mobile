@@ -37,7 +37,7 @@
 
 ## 🔗 Link PWS
 
-https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id
+https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/host:8000
 /
 
 ## 🎨 Link Design

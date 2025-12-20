@@ -4,7 +4,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 import '/models/user_entry.dart';
-import '/widgets/left_drawer.dart';
+import '../widgets/left_drawer.dart';
 
 class MyHomePage extends StatefulWidget {
   final UserEntry user;
@@ -14,8 +14,9 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>{
+class _MyHomePageState extends State<MyHomePage> {
   late UserEntry user;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -28,8 +29,9 @@ class _MyHomePageState extends State<MyHomePage>{
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFFF5F5F5),
-       drawer: LeftDrawer(user: user),
+      drawer: LeftDrawer(user: user),
       // ============================ BODY ============================
       body: Column(
         children: [
@@ -50,10 +52,7 @@ class _MyHomePageState extends State<MyHomePage>{
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color(0xFF8CB685),
-            Color(0xFF6CA06E),
-          ],
+          colors: [Color(0xFF8CB685), Color(0xFF6CA06E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -70,26 +69,38 @@ class _MyHomePageState extends State<MyHomePage>{
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // ← FIXED: This opens the drawer now
-              Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white, size: 32),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
+              IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
               ),
-
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => ProfilePage(user: user),
-                  ));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ProfilePage(user: user)),
+                  );
                 },
                 child: CircleAvatar(
                   radius: 24,
-                  backgroundImage: user.photo != null
-                      ? NetworkImage(user.photo!)
-                      : const AssetImage("assets/default.png")
-                          as ImageProvider,
+                  backgroundColor: const Color(0xFF6B8E72),
+                  child: user.photo != null
+                      ? ClipOval(
+                          child: Image.network(
+                            user.photo!,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              );
+                            },
+                          ),
+                        )
+                      : const Icon(Icons.person, color: Colors.white),
                 ),
               ),
             ],
@@ -152,7 +163,6 @@ class _MyHomePageState extends State<MyHomePage>{
     );
   }
 
-
   // ====================== POPULAR SPORTS ===========================
   Widget _buildPopularSports() {
     return Column(
@@ -173,7 +183,10 @@ class _MyHomePageState extends State<MyHomePage>{
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
               _sportIcon(Icons.sports_soccer, "Soccer"),
-              _sportIcon(Icons.sports_tennis, "Badminton"), //TODO: ganti icon nanti
+              _sportIcon(
+                Icons.sports_tennis,
+                "Badminton",
+              ), //TODO: ganti icon nanti
               _sportIcon(Icons.sports_tennis, "Tennis"),
               _sportIcon(Icons.sports_basketball, "Basketball"),
             ],
@@ -228,4 +241,3 @@ class _MyHomePageState extends State<MyHomePage>{
     );
   }
 }
-

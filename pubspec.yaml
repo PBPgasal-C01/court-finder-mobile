@@ -39,6 +39,14 @@ dependencies:
   image_picker: ^1.2.1
   http: ^1.6.0
   google_sign_in: ^6.1.0
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  geolocator: ^11.0.0
+  intl: ^0.18.1
+  path: any
+  collection: any
+  equatable: any
+  flutter_map_marker_cluster: any
 
 dev_dependencies:
   flutter_test:
@@ -61,8 +69,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
   assets:
     - static/images/cflogo2.png
     - assets/images/

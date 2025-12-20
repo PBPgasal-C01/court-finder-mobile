@@ -152,18 +152,15 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    )),
-                const SizedBox(height: 3),
                 Text(
-                  value,
+                  label,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
                   ),
                 ),
+                const SizedBox(height: 3),
+                Text(value, style: const TextStyle(fontSize: 16)),
               ],
             ),
           )

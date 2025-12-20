@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'dart:convert';
 
 class BlogFormPage extends StatefulWidget {
   const BlogFormPage({super.key});
@@ -184,15 +187,63 @@ class _BlogFormPageState extends State<BlogFormPage> {
             borderRadius: BorderRadius.circular(22),
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState?.validate() ?? false) {
-            // Untuk sekarang, hanya tampilkan snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Blog saved (dummy, belum ke backend)'),
+            // Show loading
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(color: Color(0xFF6B8E72)),
               ),
             );
-            Navigator.pop(context);
+
+            try {
+              final request = context.read<CookieRequest>();
+              const baseUrl =
+                  'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
+
+              final response = await request.postJson(
+                '$baseUrl/blog/api/posts/create/',
+                jsonEncode({
+                  'title': _titleController.text.trim(),
+                  'author': _authorController.text.trim(),
+                  'content': _contentController.text.trim(),
+                  'thumbnail_url': _thumbnailController.text.trim(),
+                }),
+              );
+
+              if (!mounted) return;
+              Navigator.pop(context); // Close loading
+
+              if (response['ok'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Blog post created successfully!'),
+                    backgroundColor: Color(0xFF6B8E72),
+                  ),
+                );
+                Navigator.pop(context, true); // Return true to indicate success
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Failed: ${response['error'] ?? 'Unknown error'}',
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (!mounted) return;
+              Navigator.pop(context); // Close loading
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: ${e.toString()}'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         },
         child: const Text(

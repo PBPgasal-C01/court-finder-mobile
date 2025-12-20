@@ -5,6 +5,10 @@ import '/models/user_entry.dart';
 import '/screens/login.dart';
 import '/screens/user_profile.dart';
 import '/screens/admin_dashboard.dart';
+import 'package:court_finder_mobile/main.dart';
+import 'package:court_finder_mobile/screens/game_scheduler/game_scheduler_page.dart';
+import 'package:court_finder_mobile/screens/complain/menu_complaint.dart'; // Untuk User Biasa
+import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart'; // Untuk Admin
 
 class LeftDrawer extends StatelessWidget {
   final UserEntry user;
@@ -28,10 +32,28 @@ class LeftDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: user.photo != null
-                        ? NetworkImage(user.photo!)
-                        : const AssetImage("assets/default.png")
-                            as ImageProvider,
+                    backgroundColor: const Color(0xFF6B8E72),
+                    child: user.photo != null
+                        ? ClipOval(
+                            child: Image.network(
+                              user.photo!,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.person,
+                                  size: 30,
+                                  color: Colors.white,
+                                );
+                              },
+                            ),
+                          )
+                        : const Icon(
+                            Icons.person,
+                            size: 30,
+                            color: Colors.white,
+                          ),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -54,6 +76,7 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.person_outline,
               label: "Profile",
               onTap: () {
+                Navigator.pop(context);
                 // Navigate to Profile Page (remove `const` because `user` is runtime)
                 Navigator.push(
                   context,
@@ -63,18 +86,19 @@ class LeftDrawer extends StatelessWidget {
             ),
 
             _drawerItem(
-              icon: Icons.report_gmailerrorred_outlined,
-              label: "Complaint",
-              onTap: () {
-                // TODO: Navigate to Complaint Page
-              },
-            ),
-
-            _drawerItem(
               icon: Icons.article_outlined,
               label: "Blog",
               onTap: () {
-                // TODO: Navigate to Blog Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 4, // 4 = Blog
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -82,7 +106,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.location_on_outlined,
               label: "Finder",
               onTap: () {
-                // TODO: Navigate to Finder Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 3, // 3 = Court Finder
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -90,7 +123,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.edit_outlined,
               label: "Manage",
               onTap: () {
-                // TODO: Navigate to Manage Booking / Court Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 1, // 1 = Manage Court
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -98,7 +140,33 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.event_outlined,
               label: "Event",
               onTap: () {
-                // TODO: Navigate to Event Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 2, // 2 = Event tab
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            _drawerItem(
+              icon: Icons.warning_amber_rounded, // Icon yang cocok untuk report
+              label: "Report",
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 4, // 4 = Report/Complaint
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -109,6 +177,7 @@ class LeftDrawer extends StatelessWidget {
                 label: "Manage Users",
                 onTap: () {
                   // TODO: Navigate to Admin Manage Users Page
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => AdminDashboardPage()),
@@ -123,7 +192,9 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.logout,
               label: "Logout",
               onTap: () async {
-                await request.logout("https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/");
+                await request.logout(
+                  "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/",
+                );
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -148,13 +219,7 @@ class LeftDrawer extends StatelessWidget {
 
     return ListTile(
       leading: Icon(icon, color: green),
-      title: Text(
-        label,
-        style: const TextStyle(
-          color: green,
-          fontSize: 16,
-        ),
-      ),
+      title: Text(label, style: const TextStyle(color: green, fontSize: 16)),
       onTap: onTap,
     );
   }

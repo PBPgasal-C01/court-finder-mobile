@@ -1,56 +1,77 @@
+// To parse this JSON data, do
+//
+//     final blogPost = blogPostFromJson(jsonString);
+
+import 'dart:convert';
+
+List<BlogPost> blogPostListFromJson(String str) =>
+    List<BlogPost>.from(json.decode(str).map((x) => BlogPost.fromJson(x)));
+
+BlogPost blogPostFromJson(String str) => BlogPost.fromJson(json.decode(str));
+
+String blogPostToJson(BlogPost data) => json.encode(data.toJson());
+
 class BlogPost {
-  final int id;
-  final String author;
-  final String thumbnailUrl;
-  final String title;
-  final String content;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  int id;
+  String title;
+  String author;
+  String content;
+  String thumbnailUrl;
+  DateTime createdAt;
+  dynamic readingTime;
+  DateTime? updatedAt;
 
   BlogPost({
     required this.id,
-    required this.author,
-    required this.thumbnailUrl,
     required this.title,
+    required this.author,
     required this.content,
+    required this.thumbnailUrl,
     required this.createdAt,
-    required this.updatedAt,
+    this.readingTime,
+    this.updatedAt,
   });
 
-  factory BlogPost.fromJson(Map<String, dynamic> json) {
-    return BlogPost(
-      id: json['id'],
-      author: json['author'] ?? '',
-      thumbnailUrl: json['thumbnail_url'] ?? '',
-      title: json['title'] ?? '',
-      content: json['content'] ?? '',
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-    );
-  }
+  factory BlogPost.fromJson(Map<String, dynamic> json) => BlogPost(
+    id: json["id"],
+    title: json["title"],
+    author: json["author"],
+    content: json["content"],
+    // Clean thumbnail URL from any whitespace, line breaks
+    thumbnailUrl: (json["thumbnail_url"] ?? '')
+        .toString()
+        .trim()
+        .replaceAll('\n', '')
+        .replaceAll('\r', '')
+        .replaceAll(' ', ''),
+    createdAt: DateTime.parse(json["created_at"]),
+    readingTime: json["reading_time"],
+    updatedAt: json["updated_at"] != null
+        ? DateTime.parse(json["updated_at"])
+        : null,
+  );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'author': author,
-      'thumbnail_url': thumbnailUrl,
-      'title': title,
-      'content': content,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "title": title,
+    "author": author,
+    "content": content,
+    "thumbnail_url": thumbnailUrl,
+    "created_at": createdAt.toIso8601String(),
+    "reading_time": readingTime,
+    if (updatedAt != null) "updated_at": updatedAt!.toIso8601String(),
+  };
 
+  // Helper getter untuk reading time dalam menit
   int get readingTimeMinutes {
-    final words = content.split(' ').length;
-    final minutes = (words / 200).ceil();
-    return minutes > 0 ? minutes : 1;
-  }
-
-  String summary({int words = 40}) {
-    if (content.isEmpty) return '';
-    final parts = content.split(' ');
-    if (parts.length <= words) return content;
-    return '${parts.take(words).join(' ')}…';
+    if (readingTime == null) return 5;
+    // Handle both int and double from JSON
+    if (readingTime is int) return readingTime as int;
+    if (readingTime is double) return (readingTime as double).round();
+    // Try parse if string
+    if (readingTime is String) {
+      return int.tryParse(readingTime as String) ?? 5;
+    }
+    return 5;
   }
 }

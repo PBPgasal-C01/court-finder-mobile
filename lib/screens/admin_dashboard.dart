@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
 
@@ -24,7 +23,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   // ===================== FETCH USERS =====================
   Future<List<UserEntry>> fetchUsers(CookieRequest request) async {
-    final response = await request.get("https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/all-users");
+    final response = await request.get(
+      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/all-users",
+    );
     List<UserEntry> users = [];
 
     for (var d in response) {
@@ -44,8 +45,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(res["message"])));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(res["message"])));
 
     setState(() {
       futureUsers = fetchUsers(request);
@@ -62,8 +64,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(res["message"])));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(res["message"])));
 
     setState(() {
       futureUsers = fetchUsers(request);
@@ -120,45 +123,65 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: const Row(
         children: [
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("NAME",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "NAME",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 3,
-              child: Center(
-                child: Text("EMAIL",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 3,
+            child: Center(
+              child: Text(
+                "EMAIL",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("JOINED",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "JOINED",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("STATUS",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "STATUS",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           Expanded(
-              flex: 2,
-              child: Center(
-                child: Text("ACTIONS",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              )),
+            flex: 2,
+            child: Center(
+              child: Text(
+                "ACTIONS",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -169,9 +192,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,4 +303,3 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 }
-
