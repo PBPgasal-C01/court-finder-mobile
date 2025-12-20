@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:court_finder_mobile/models/complain/complaint_entry.dart';
 
 class ComplaintDetailEditPage extends StatefulWidget {
@@ -29,7 +28,6 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
   String? _selectedStatus;
   bool _isLoading = false;
 
-  // REVISI: Menghapus 'REJECTED' sesuai model Django Anda
   final List<String> _statusOptions = [
     'IN REVIEW',
     'IN PROCESS',
@@ -39,12 +37,9 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
   @override
   void initState() {
     super.initState();
-    
-    // Logika untuk memastikan status awal terpilih dengan benar
+
     String currentStatus = widget.complaint.status;
-    
-    // Cek apakah status dari database ada di list opsi kita
-    // Kita cek exact match atau case-insensitive match
+
     var matchingStatus = _statusOptions.firstWhere(
       (element) => element.toUpperCase() == currentStatus.toUpperCase(),
       orElse: () => '',
@@ -53,7 +48,6 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
     if (matchingStatus.isNotEmpty) {
       _selectedStatus = matchingStatus;
     } else {
-      // Jika status di database berbeda (misal: "Ditinjau"), default ke 'IN REVIEW'
       _selectedStatus = _statusOptions[0];
     }
     
@@ -75,18 +69,10 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
       final request = context.read<CookieRequest>();
 
       try {
-        // 1. Tentukan Base URL
-        String baseUrl;
-        if (kIsWeb) {
-          baseUrl = "http://127.0.0.1:8000";
-        } else {
-          baseUrl = "http://10.0.2.2:8000";
-        }
-        
-        // 2. Endpoint update
+        String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
+
         final String url = '$baseUrl/complain/update-flutter/${widget.complaintId}/';
 
-        // 3. Kirim Request
         final response = await request.postJson(
           url,
           jsonEncode(<String, dynamic>{
@@ -187,12 +173,10 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Problem Title (Read-only)
                     _buildLabel("Problem Title:"),
                     _buildReadOnlyField(widget.complaint.masalah),
                     const SizedBox(height: 20),
 
-                    // User Description (Read-only)
                     _buildLabel("User Description:"),
                     _buildReadOnlyField(
                       widget.complaint.deskripsi,
@@ -249,7 +233,6 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                       const SizedBox(height: 30),
                     ],
 
-                    // Status Dropdown
                     _buildLabel("Status"),
                     Container(
                       decoration: BoxDecoration(
@@ -289,7 +272,6 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Komentar
                     _buildLabel("Comment"),
                     _buildTextField(
                       controller: _komentarController,
@@ -299,7 +281,6 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                     ),
                     const SizedBox(height: 40),
 
-                    // Action Buttons
                     Row(
                       children: [
                         Expanded(

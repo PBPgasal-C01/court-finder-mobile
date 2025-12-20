@@ -19,32 +19,21 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
   final Color textGreen = const Color(0xFF4A614A);
   final Color bgGreen = const Color(0xFFF2F7F2);
 
-  // Fungsi Refresh Data (Dipanggil saat tarik ke bawah)
   Future<void> _refreshComplaints() async {
-    // setState akan memicu build ulang, sehingga fetchComplaints jalan lagi
     setState(() {});
-    // Delay sedikit agar loading spinner terlihat natural
     return Future.delayed(const Duration(seconds: 1)); 
   }
 
   Future<List<ComplaintEntry>> fetchComplaints(CookieRequest request) async {
     try {
-      // 1. LOGIKA URL ADAPTIF
-      String baseUrl;
-      if (kIsWeb) {
-        baseUrl = 'http://127.0.0.1:8000';
-      } else {
-        baseUrl = 'http://10.0.2.2:8000';
-      }
-      
-      // Pastikan URL path sesuai dengan Django (tanpa 't' di complain)
+      String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
+
       var url = '$baseUrl/complain/json-flutter/';
 
       print("🔍 Fetching complaints from: $url");
       
       var response = await request.get(url);
-      
-      // 2. ERROR HANDLING
+
       if (response is Map && response.containsKey('status')) {
         if (response['status'] == 'error') {
           throw Exception(response['message'] ?? 'Unknown error');
@@ -55,17 +44,11 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
         throw Exception("Invalid response format. Expected List, got: ${response.runtimeType}");
       }
 
-      // 3. PARSING DATA
       List<ComplaintEntry> listComplaint = [];
       for (var d in response) {
         if (d != null) {
           try {
-            // Fix URL Gambar untuk Android
-            if (!kIsWeb && d['foto_url'] != null) {
-              d['foto_url'] = d['foto_url'].toString()
-                  .replaceAll('127.0.0.1', '10.0.2.2')
-                  .replaceAll('localhost', '10.0.2.2');
-            }
+
             listComplaint.add(ComplaintEntry.fromJson(d));
           } catch (e) {
             print("⚠️ Error parsing complaint: $e");
@@ -87,26 +70,25 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      // Kita gunakan Column agar Header tetap diam di atas
+
       body: Column(
         children: [
-          // Header Statis (Tidak ikut scroll refresh)
+
           _buildHeader(request),
-          
-          // Area Konten yang bisa di-Refresh
+
           Expanded(
             child: RefreshIndicator(
               onRefresh: _refreshComplaints,
               child: FutureBuilder(
                 future: fetchComplaints(request),
                 builder: (context, AsyncSnapshot<List<ComplaintEntry>> snapshot) {
-                  // State 1: Loading
+
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } 
-                  // State 2: Error
+
                   else if (snapshot.hasError) {
-                    // Bungkus dengan ListView agar bisa ditarik untuk refresh saat error
+
                     return ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
@@ -121,9 +103,9 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                       ],
                     );
                   } 
-                  // State 3: Kosong
+
                   else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    // Bungkus dengan ListView agar bisa ditarik untuk refresh saat kosong
+                    
                     return ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
@@ -132,15 +114,15 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                       ],
                     );
                   } 
-                  // State 4: Ada Data (Sukses)
+
                   else {
                     return ListView.builder(
                       padding: const EdgeInsets.only(bottom: 80),
-                      // Tambah 1 item untuk Judul "Report Archive"
+
                       itemCount: snapshot.data!.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
-                          // Item pertama adalah Judul
+                  
                           return Padding(
                             padding: const EdgeInsets.fromLTRB(24, 24, 24, 10),
                             child: const Text(
@@ -153,15 +135,15 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                             ),
                           );
                         }
-                        // Item selanjutnya adalah Data (index - 1)
+
                         final complaint = snapshot.data![index - 1];
                         return ComplaintCard(
                           complaint: complaint,
                           onTap: () {},
                           
-                          // LOGIKA DELETE YANG SINKRON
+      
                           onDelete: () async {
-                            // 1. Tampilkan dialog konfirmasi (Opsional tapi disarankan)
+
                             bool confirm = await showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
@@ -181,13 +163,12 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                             ) ?? false;
 
                             if (confirm) {
-                                // 2. Tentukan URL Adaptif
-                                String baseUrl = kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
-                                var url = '$baseUrl/complain/delete-flutter/${complaint.id}/'; // Gunakan PK/ID dari complaint
+      
+                                String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
+                                var url = '$baseUrl/complain/delete-flutter/${complaint.id}/';
 
-                                // 3. Kirim Request POST
                                 try {
-                                    final response = await request.post(url, {}); // Body kosong tidak apa-apa
+                                    final response = await request.post(url, {}); 
                                     
                                     // 4. Cek Hasil
                                     if (response['status'] == 'success') {
@@ -245,9 +226,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.sort, color: Colors.white, size: 28),
-              // Ganti Image Network yang error dengan Icon Statis
-              Container(
+              const Icon(Icons.sort, color: Colors.white, size: 28),   Container(
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
@@ -284,7 +263,6 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                     builder: (context) => const AddComplaintPage(),
                   ),
                 );
-                // Jika kembali dari halaman tambah dengan sukses (true), refresh data
                 if (mounted && result == true) {
                   _refreshComplaints();
                 }
@@ -331,7 +309,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
         ),
         const SizedBox(height: 10),
         Text(
-          "Pull down to refresh", // Petunjuk user
+          "Pull down to refresh", 
           style: TextStyle(color: Colors.grey[300], fontSize: 12),
         ),
       ],
