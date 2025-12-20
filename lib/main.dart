@@ -43,58 +43,44 @@ class MyApp extends StatelessWidget {
 class MainPage extends StatefulWidget {
   final UserEntry? user;
   final int initialIndex;
-  const MainPage({super.key, this.user, this.initialIndex = 2});
+  const MainPage({super.key, this.user, this.initialIndex = 0});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 2;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex.clamp(0, 5).toInt();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-    final sessionCookie = request.cookies.values
-        .firstWhere(
-          (cookie) => cookie.name == 'sessionid',
-          orElse: () => request.cookies.values.firstWhere(
-            (c) => c.name == 'csrftoken',
-            orElse: () => Cookie(
-              'sessionid',
-              '',
-              DateTime.now().millisecondsSinceEpoch + 3600000,
-            ),
-          ),
-        )
-        .value;
+    if (widget.user == null) {
+      // No authenticated user; redirect to login rather than showing placeholders.
+      return const LoginPage();
+    }
 
     final List<Widget> pages = [
-      const GameSchedulerPage(),
-      widget.user != null
-          ? ManageCourtScreen(user: widget.user!)
-          : const PlaceholderPage(title: 'Manage Court'),
+      MyHomePage(user: widget.user!),
+      ManageCourtScreen(user: widget.user!),
+      GameSchedulerPage(user: widget.user!),
       const CourtFinderScreen(),
-      const BlogPage(),
-      widget.user == null
-          ? const PlaceholderPage(title: 'Report')
-          : (widget.user!.isSuperuser
-                ? const AdminHomeScreen()
-                : const ComplaintScreen()),
+      BlogPage(user: widget.user!),
+      widget.user!.isSuperuser
+          ? const AdminHomeScreen()
+          : const ComplaintScreen(),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Court Finder",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF6B8E72),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+    final int activeIndex = _selectedIndex.clamp(0, pages.length - 1).toInt();
 
-      body: IndexedStack(index: _selectedIndex, children: pages),
+    return Scaffold(
+      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+      body: IndexedStack(index: activeIndex, children: pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF6B8E72),
@@ -108,11 +94,12 @@ class _MainPageState extends State<MainPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.event, 'Event', 0),
+              _buildNavItem(Icons.home, 'Home', 0),
               _buildNavItem(Icons.edit, 'Manage', 1),
+              _buildNavItem(Icons.event, 'Event', 2),
               _buildCenterLogo(),
-              _buildNavItem(Icons.article, 'Blog', 3),
-              _buildNavItem(Icons.comment, 'Report', 4),
+              _buildNavItem(Icons.article, 'Blog', 4),
+              _buildNavItem(Icons.comment, 'Report', 5),
             ],
           ),
         ),
@@ -122,6 +109,7 @@ class _MainPageState extends State<MainPage> {
 
   Widget _buildNavItem(IconData icon, String label, int index) {
     final bool isSelected = _selectedIndex == index;
+    final Color color = isSelected ? Colors.white : Colors.white70;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -131,14 +119,14 @@ class _MainPageState extends State<MainPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 28),
+          Icon(icon, color: color, size: 28),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: color,
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -150,7 +138,7 @@ class _MainPageState extends State<MainPage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedIndex = 2;
+          _selectedIndex = 3;
         });
       },
       child: Transform.translate(
@@ -185,29 +173,6 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class PlaceholderPage extends StatelessWidget {
-  final String title;
-
-  const PlaceholderPage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: const Color(0xFF6B8E72),
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: Text(
-          '$title Page',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
     );
