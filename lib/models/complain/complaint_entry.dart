@@ -30,7 +30,7 @@ class ComplaintEntry {
         courtName: json["court_name"],
         masalah: json["masalah"],
         deskripsi: json["deskripsi"],
-        fotoUrl: json["foto_url"],
+        fotoUrl: json["foto_url"] ?? "",
         status: json["status"],
         komentar: json["komentar"],
         createdAt: DateTime.parse(json["created_at"]),

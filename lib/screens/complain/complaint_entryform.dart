@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http; // Import untuk HTTP request
-import 'dart:convert'; // Import untuk JSON decoding
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class AddComplaintPage extends StatefulWidget {
   const AddComplaintPage({super.key});
@@ -22,10 +23,9 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
   final Color _headerColor = const Color(0xFF3F5940);
   final Color _inputBoxColor = const Color(0xFFF3F3F3);
 
-  File? _selectedImage;
+  XFile? _selectedImage; 
   final ImagePicker _picker = ImagePicker();
 
-  // Flag untuk mencegah double submit saat loading
   bool _isLoading = false;
 
   @override
@@ -41,7 +41,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImage = image;
         });
       }
     } catch (e) {
@@ -89,95 +89,66 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
     );
   }
 
-  // --- LOGIKA SUBMIT KE DJANGO ---
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() { _isLoading = true; });
 
-      // Tampilkan feedback loading
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Sending report...")),
-      );
-
-      // URL Endpoint Django (Ganti 10.0.2.2 dengan IP Laptop jika di HP fisik)
-      final Uri url = Uri.parse('http://10.0.2.2:8000/complaint/create-flutter/');
-
-      // Gunakan MultipartRequest untuk kirim File + Teks
-      final request = http.MultipartRequest('POST', url);
-
-      // Isi Data Teks
-      request.fields['court_name'] = _courtNameController.text;
-      request.fields['masalah'] = _masalahController.text;
-      request.fields['deskripsi'] = _deskripsiController.text;
-
-      // Isi Data File (Jika ada gambar dipilih)
-      if (_selectedImage != null) {
-        final file = await http.MultipartFile.fromPath(
-          'foto', // Harus sesuai nama field di Django request.FILES['foto']
-          _selectedImage!.path,
-        );
-        request.files.add(file);
-      }
-
+      final request = context.read<CookieRequest>();
+      
       try {
-        // Kirim Request
-        final streamedResponse = await request.send();
-        final response = await http.Response.fromStream(streamedResponse);
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          if (data['status'] == 'success') {
-            if (!mounted) return;
-            
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Laporan berhasil disimpan!"),
-                backgroundColor: Colors.green,
-              ),
-            );
-
-            // Kembali ke halaman list dengan sinyal refresh
-            Navigator.pop(context, true);
-          } else {
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Gagal: ${data['message']}"),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+        String baseUrl;
+        // Penyesuaian URL untuk Web vs Android Emulator
+        if (kIsWeb) {
+          baseUrl = "http://127.0.0.1:8000";
         } else {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error Server: ${response.statusCode}")),
-          );
+          baseUrl = "http://10.0.2.2:8000"; // IP Loopback Android Emulator
+        }
+        final String url = '$baseUrl/complain/create-flutter/';
+
+        String? base64Image;
+        if (_selectedImage != null) {
+          // UBAH 3: Baca bytes langsung dari XFile (aman untuk web)
+          List<int> imageBytes = await _selectedImage!.readAsBytes();
+          String base64Str = base64Encode(imageBytes);
+          base64Image = "data:image/jpeg;base64,$base64Str";
+        }
+
+        final response = await request.postJson(
+            url,
+            jsonEncode(<String, dynamic>{
+                'court_name': _courtNameController.text,
+                'masalah': _masalahController.text,
+                'deskripsi': _deskripsiController.text,
+                'foto': base64Image,
+            }),
+        );
+
+        if (response['status'] == 'success') {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Laporan berhasil disimpan!"), backgroundColor: Colors.green));
+            Navigator.pop(context, true);
+        } else {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Gagal: ${response['message']}"), backgroundColor: Colors.red));
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Terjadi kesalahan koneksi: $e")),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
       } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
+        if (mounted) { setState(() { _isLoading = false; }); }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ... Bagian UI build tetap sama persis seperti sebelumnya ...
+    // (Copy bagian Widget build kamu yang tadi sudah benar)
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // --- HEADER SECTION (DIKECILKAN) ---
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
@@ -202,14 +173,12 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    "Sampaikan keluhan fasilitas lapangan",
+                    "Share us the court's problem",
                     style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
             ),
-
-            // --- FORM SECTION ---
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Form(
@@ -220,28 +189,23 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                     _buildLabel("Court Name"),
                     _buildTextField(
                       controller: _courtNameController,
-                      hint: "Contoh: Lapangan Futsal A",
+                      hint: "Example: Football Field A",
                     ),
                     const SizedBox(height: 20),
-
                     _buildLabel("Problem Title"),
                     _buildTextField(
                       controller: _masalahController,
-                      hint: "Contoh: Lampu Mati / Jaring Rusak",
+                      hint: "Example : The goal is damaged",
                     ),
                     const SizedBox(height: 20),
-
                     _buildLabel("Description"),
                     _buildTextField(
                       controller: _deskripsiController,
-                      hint: "Jelaskan detail kerusakan...",
+                      hint: "Detail",
                       maxLines: 5,
                     ),
                     const SizedBox(height: 20),
-
                     _buildLabel("Upload Image"),
-                    
-                    // IMAGE UPLOAD SECTION
                     GestureDetector(
                       onTap: _showImageSourceDialog,
                       child: Container(
@@ -250,70 +214,46 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                         decoration: BoxDecoration(
                           color: _inputBoxColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.grey[300]!,
-                            width: 2,
-                            style: BorderStyle.solid,
-                          ),
+                          border: Border.all(color: Colors.grey[300]!, width: 2, style: BorderStyle.solid),
                         ),
                         child: _selectedImage == null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.add_photo_alternate,
-                                    size: 60,
-                                    color: Colors.grey[400],
-                                  ),
+                                  Icon(Icons.add_photo_alternate, size: 60, color: Colors.grey[400]),
                                   const SizedBox(height: 10),
-                                  Text(
-                                    "Tap to upload image",
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 14,
-                                    ),
-                                  ),
+                                  Text("Tap to upload image", style: TextStyle(color: Colors.grey[600], fontSize: 14)),
                                   const SizedBox(height: 5),
-                                  Text(
-                                    "Camera or Gallery",
-                                    style: TextStyle(
-                                      color: Colors.grey[400],
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                                  Text("Camera or Gallery", style: TextStyle(color: Colors.grey[400], fontSize: 12)),
                                 ],
                               )
                             : Stack(
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.file(
-                                      _selectedImage!,
-                                      width: double.infinity,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    child: kIsWeb
+                                        ? Image.network(
+                                            _selectedImage!.path, // Web pakai Image.network (Blob URL)
+                                            width: double.infinity,
+                                            height: 200,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.file(
+                                            File(_selectedImage!.path), // Mobile pakai Image.file
+                                            width: double.infinity,
+                                            height: 200,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                   Positioned(
                                     top: 8,
                                     right: 8,
                                     child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedImage = null;
-                                        });
-                                      },
+                                      onTap: () { setState(() { _selectedImage = null; }); },
                                       child: Container(
                                         padding: const EdgeInsets.all(6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.close,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
+                                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                        child: const Icon(Icons.close, color: Colors.white, size: 20),
                                       ),
                                     ),
                                   ),
@@ -321,20 +261,12 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                               ),
                       ),
                     ),
-
                     const SizedBox(height: 40),
-
-                    // --- BUTTONS SECTION ---
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ComplaintScreen()),
-                              );
-                            },
+                            onPressed: () { Navigator.pop(context); },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFF8D7DA),
                               foregroundColor: const Color(0xFF721C24),
@@ -345,18 +277,13 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                               ),
                               elevation: 0,
                             ),
-                            child: const Text(
-                              "CANCEL",
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
+                            child: const Text("CANCEL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           ),
                         ),
-                        
                         const SizedBox(width: 20),
-
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _submitForm, // Disable button saat loading
+                            onPressed: _isLoading ? null : _submitForm,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: _headerColor,
@@ -368,15 +295,8 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                               elevation: 0,
                             ),
                             child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Text(
-                                    "SAVE",
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                  ),
+                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                                : const Text("SAVE", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           ),
                         ),
                       ],
@@ -390,7 +310,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
       ),
     );
   }
-
+  // Widget _buildLabel dan _buildTextField sama seperti sebelumnya
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
@@ -431,7 +351,10 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
         ),
       ),
     );

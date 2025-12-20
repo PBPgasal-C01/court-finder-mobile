@@ -5,11 +5,13 @@ import 'dart:io';
 class ComplaintCard extends StatelessWidget {
   final ComplaintEntry complaint;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   const ComplaintCard({
     super.key,
     required this.complaint,
     this.onTap,
+    this.onDelete,
   });
 
   Color _getStatusColor(String status) {
@@ -17,14 +19,14 @@ class ComplaintCard extends StatelessWidget {
       case 'in review':
         return const Color(0xFFFFA726);
       case 'in process':
-        return const Color(0xFF42A5F5); 
+        return const Color(0xFF42A5F5);
       case 'done':
         return const Color(0xFF66BB6A);
       default:
         return Colors.grey;
     }
   }
-  
+
   String _getStatusDisplay(String status) {
     switch (status.toLowerCase()) {
       case 'in review':
@@ -40,6 +42,9 @@ class ComplaintCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Definisi warna hijau tema agar konsisten
+    final Color themeGreen = const Color(0xFF6B8E72);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -58,14 +63,18 @@ class ComplaintCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header dengan nama lapangan dan masalah
+            // --- HEADER SECTION ---
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF6B8E72),
+                color: Colors.white, // UBAH KE PUTIH
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
+                ),
+                // Tambahkan border bawah tipis sebagai pemisah
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade200, width: 1.5),
                 ),
               ),
               child: Row(
@@ -74,8 +83,8 @@ class ComplaintCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '${complaint.courtName.toUpperCase()} - ${complaint.masalah.toUpperCase()}',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle( // Hilangkan const karena menggunakan variabel warna
+                        color: themeGreen, // UBAH TEXT KE HIJAU AGAR TERBACA
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -88,7 +97,7 @@ class ComplaintCard extends StatelessWidget {
               ),
             ),
 
-            // Content area
+            // --- CONTENT AREA ---
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -146,42 +155,63 @@ class ComplaintCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
 
-                        // Status
+                        // Status dan Tombol Hapus
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Status',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF757575),
-                                fontWeight: FontWeight.w500,
-                              ),
+                            // Status di sebelah kiri
+                            Row(
+                              children: [
+                                const Text(
+                                  'Status',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF757575),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const Text(
+                                  ' : ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF757575),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _getStatusColor(complaint.status),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    _getStatusDisplay(complaint.status),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const Text(
-                              ' : ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF757575),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _getStatusColor(complaint.status),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                _getStatusDisplay(complaint.status),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+
+                            // Tombol Hapus di sebelah kanan (jika status 'IN REVIEW')
+                            if (complaint.status.toLowerCase() == 'in review')
+                              InkWell(
+                                onTap: () {
+                                  if (onDelete != null) {
+                                    onDelete!();
+                                  }
+                                },
+                                child: Image.asset(
+                                  'static/images/trash.png', 
+                                  width: 24, 
+                                  height: 24,
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ],
@@ -207,22 +237,22 @@ class ComplaintCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.comment,
                       size: 16,
-                      color: Color(0xFF6B8E72),
+                      color: themeGreen, // Gunakan variabel themeGreen
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Admin Comment:',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF6B8E72),
+                              color: themeGreen, // Gunakan variabel themeGreen
                             ),
                           ),
                           const SizedBox(height: 4),
