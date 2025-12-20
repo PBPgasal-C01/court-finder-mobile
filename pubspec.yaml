@@ -38,6 +38,7 @@ dependencies:
   pbp_django_auth: ^0.4.0
   image_picker: ^1.2.1
   http: ^1.6.0
+  google_sign_in: ^6.1.0
   flutter_map: ^6.1.0
   latlong2: ^0.9.0
   geolocator: ^11.0.0
@@ -69,7 +70,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - static/images/
+    - static/images/cflogo2.png
+    - assets/images/
+  # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
