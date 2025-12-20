@@ -82,9 +82,9 @@ class _BlogPageState extends State<BlogPage> {
         _filteredPosts = _blogPosts
             .where(
               (post) =>
-          post.title.toLowerCase().contains(query.toLowerCase()) ||
-              post.content.toLowerCase().contains(query.toLowerCase()),
-        )
+                  post.title.toLowerCase().contains(query.toLowerCase()) ||
+                  post.content.toLowerCase().contains(query.toLowerCase()),
+            )
             .toList();
       }
     });
@@ -217,24 +217,24 @@ class _BlogPageState extends State<BlogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Ganti background jadi putih (sebelumnya hijau)
-
+      backgroundColor:
+          Colors.white, // Ganti background jadi putih (sebelumnya hijau)
       // Floating Action Button hanya untuk Superuser
       floatingActionButton: (widget.user?.isSuperuser ?? false)
           ? FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const BlogFormPage()),
-          );
-          if (result == true) {
-            _fetchBlogPosts();
-          }
-        },
-        backgroundColor: const Color(0xFF6B8E72),
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      )
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const BlogFormPage()),
+                );
+                if (result == true) {
+                  _fetchBlogPosts();
+                }
+              },
+              backgroundColor: const Color(0xFF6B8E72),
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.add),
+            )
           : null,
 
       body: SafeArea(
@@ -281,6 +281,19 @@ class _BlogPageState extends State<BlogPage> {
                   ),
                 ),
               ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Tombol refresh di kiri tombol favorites
+          Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFF6B8E72),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.white),
+              tooltip: 'Refresh',
+              onPressed: _fetchBlogPosts,
             ),
           ),
           const SizedBox(width: 10),
@@ -527,13 +540,13 @@ class _FavoritesPageState extends State<_FavoritesPage> {
           IconButton(
             icon: _isLoading
                 ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
                 : const Icon(Icons.refresh),
             onPressed: _isLoading ? null : _refreshFavorites,
           ),
@@ -542,16 +555,16 @@ class _FavoritesPageState extends State<_FavoritesPage> {
       body: favorites.isEmpty
           ? const Center(child: Text('No favorites yet'))
           : ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: favorites.length,
-        itemBuilder: (context, index) => BlogListItem(
-          post: favorites[index],
-          isFavorited: _favoriteIds.contains(favorites[index].id),
-          onFavoriteToggle: () => _toggleFavorite(favorites[index]),
-          user: widget.user,
-          onNavigateBack: _refreshFavorites,
-        ),
-      ),
+              padding: const EdgeInsets.all(16),
+              itemCount: favorites.length,
+              itemBuilder: (context, index) => BlogListItem(
+                post: favorites[index],
+                isFavorited: _favoriteIds.contains(favorites[index].id),
+                onFavoriteToggle: () => _toggleFavorite(favorites[index]),
+                user: widget.user,
+                onNavigateBack: _refreshFavorites,
+              ),
+            ),
     );
   }
 }
