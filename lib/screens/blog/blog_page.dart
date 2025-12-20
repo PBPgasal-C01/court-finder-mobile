@@ -3,7 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import '../../models/blog/blog_post.dart';
 import '../../models/user_entry.dart';
-import '../../widgets/left_drawer.dart';
+// import '../../widgets/left_drawer.dart'; // Drawer sudah di-handle Main
 import 'blog_form.dart';
 import '../../widgets/blog/blog_widgets.dart';
 import '../../services/blog_service.dart';
@@ -61,12 +61,16 @@ class _BlogPageState extends State<BlogPage> {
   Future<void> _fetchFavorites() async {
     if (!mounted) return;
     final request = context.read<CookieRequest>();
-    final favorites = await BlogService.fetchFavorites(request);
-    if (mounted) {
-      setState(() {
-        _favoriteIds.clear();
-        _favoriteIds.addAll(favorites);
-      });
+    try {
+      final favorites = await BlogService.fetchFavorites(request);
+      if (mounted) {
+        setState(() {
+          _favoriteIds.clear();
+          _favoriteIds.addAll(favorites);
+        });
+      }
+    } catch (e) {
+      print('Error fetching favorites: $e');
     }
   }
 
@@ -78,9 +82,9 @@ class _BlogPageState extends State<BlogPage> {
         _filteredPosts = _blogPosts
             .where(
               (post) =>
-                  post.title.toLowerCase().contains(query.toLowerCase()) ||
-                  post.content.toLowerCase().contains(query.toLowerCase()),
-            )
+          post.title.toLowerCase().contains(query.toLowerCase()) ||
+              post.content.toLowerCase().contains(query.toLowerCase()),
+        )
             .toList();
       }
     });
@@ -213,119 +217,48 @@ class _BlogPageState extends State<BlogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6B8E72),
-      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+      backgroundColor: Colors.white, // Ganti background jadi putih (sebelumnya hijau)
+
+      // Floating Action Button hanya untuk Superuser
       floatingActionButton: (widget.user?.isSuperuser ?? false)
           ? FloatingActionButton(
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BlogFormPage()),
-                );
-                if (result == true) {
-                  _fetchBlogPosts();
-                }
-              },
-              backgroundColor: const Color(0xFF6B8E72),
-              foregroundColor: Colors.white,
-              child: const Icon(Icons.add),
-            )
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const BlogFormPage()),
+          );
+          if (result == true) {
+            _fetchBlogPosts();
+          }
+        },
+        backgroundColor: const Color(0xFF6B8E72),
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      )
           : null,
+
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    _buildSearchBar(),
-                    if (_filteredPosts.isNotEmpty) _buildFeaturedSection(),
-                    Expanded(child: _buildContentArea()),
-                  ],
-                ),
-              ),
-            ),
+            // --- HEADER HIJAU LAMA DIHAPUS ---
+            // Kita ganti dengan SizedBox agar SearchBar tidak nempel ke AppBar Uniform
+            const SizedBox(height: 10),
+
+            _buildSearchBar(),
+
+            if (_filteredPosts.isNotEmpty) _buildFeaturedSection(),
+
+            Expanded(child: _buildContentArea()),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6B8E72),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (widget.user != null)
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white, size: 30),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
-            )
-          else
-            const SizedBox(width: 48),
-          const Text(
-            'Blog',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white, size: 28),
-                onPressed: _loadData,
-              ),
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.white,
-                child:
-                    (widget.user?.photo != null &&
-                        widget.user!.photo!.isNotEmpty)
-                    ? ClipOval(
-                        child: Image.network(
-                          widget.user!.photo!,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
-                            Icons.person,
-                            color: Color(0xFF6B8E72),
-                          ),
-                        ),
-                      )
-                    : const Icon(Icons.person, color: Color(0xFF6B8E72)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
+  // Header lama dihapus. SearchBar langsung tampil.
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
           Expanded(
@@ -437,6 +370,7 @@ class _BlogPageState extends State<BlogPage> {
                 'For You',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
+              // Tombol "See more" dihapus/dimatikan fungsinya kalau belum ada halaman detail list
               TextButton(
                 onPressed: () {},
                 child: const Text(
@@ -593,13 +527,13 @@ class _FavoritesPageState extends State<_FavoritesPage> {
           IconButton(
             icon: _isLoading
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
                 : const Icon(Icons.refresh),
             onPressed: _isLoading ? null : _refreshFavorites,
           ),
@@ -608,16 +542,16 @@ class _FavoritesPageState extends State<_FavoritesPage> {
       body: favorites.isEmpty
           ? const Center(child: Text('No favorites yet'))
           : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: favorites.length,
-              itemBuilder: (context, index) => BlogListItem(
-                post: favorites[index],
-                isFavorited: _favoriteIds.contains(favorites[index].id),
-                onFavoriteToggle: () => _toggleFavorite(favorites[index]),
-                user: widget.user,
-                onNavigateBack: _refreshFavorites,
-              ),
-            ),
+        padding: const EdgeInsets.all(16),
+        itemCount: favorites.length,
+        itemBuilder: (context, index) => BlogListItem(
+          post: favorites[index],
+          isFavorited: _favoriteIds.contains(favorites[index].id),
+          onFavoriteToggle: () => _toggleFavorite(favorites[index]),
+          user: widget.user,
+          onNavigateBack: _refreshFavorites,
+        ),
+      ),
     );
   }
 }

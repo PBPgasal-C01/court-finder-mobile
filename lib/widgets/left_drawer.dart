@@ -95,7 +95,7 @@ class LeftDrawer extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => MainPage(
                       user: user,
-                      initialIndex: 3, // 3 = Blog
+                      initialIndex: 4, // 4 = Blog
                     ),
                   ),
                 );
@@ -112,7 +112,7 @@ class LeftDrawer extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => MainPage(
                       user: user,
-                      initialIndex: 2, // 2 = Court Finder
+                      initialIndex: 3, // 3 = Court Finder
                     ),
                   ),
                 );
