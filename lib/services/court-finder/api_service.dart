@@ -6,7 +6,7 @@ import '../../models/court-finder/province.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/courts';
+  static const String baseUrl = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/courts';
 
   Map<String, String> _getHeaders({String? token}) {
     final headers = {
@@ -24,18 +24,39 @@ class ApiService {
     try {
       print("Sending request to: $baseUrl/api/search/");
 
-      final response = await request.postJson(
-          '$baseUrl/api/search/',
-          jsonEncode(filter.toRequestBody())
-      );
+      final url = Uri.parse('$baseUrl/api/search/');
 
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+      };
 
-      if (response != null && response['courts'] != null) {
-        final List<dynamic> courtsJson = response['courts'];
-        return courtsJson.map((json) => Court.fromJson(json)).toList();
-      } else {
-        return [];
+      if (request.cookies.isNotEmpty) {
+        String cookieHeader = "";
+        request.cookies.forEach((key, value) {
+          cookieHeader += "$key=${value.value}; ";
+        });
+        headers['Cookie'] = cookieHeader;
       }
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(filter.toRequestBody()),
+      ).timeout(const Duration(seconds: 15));
+
+      print("Response Status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body); // Decode JSON manual
+        if (data['courts'] != null) {
+          final List<dynamic> courtsJson = data['courts'];
+          return courtsJson.map((json) => Court.fromJson(json)).toList();
+        }
+      } else {
+        print("Server Error: ${response.statusCode}");
+      }
+      return [];
+
     } catch (e) {
       print("Exception in searchCourts: $e");
       return [];
