@@ -10,6 +10,9 @@ import 'widgets/left_drawer.dart';
 import 'screens/manage-court/manage_court_screen.dart';
 import 'screens/court-finder/court_finder_screen.dart';
 
+import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';
+import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -42,6 +45,8 @@ class MainPage extends StatefulWidget {
   final int initialIndex;
   const MainPage({super.key, this.user, this.initialIndex = 2});
 
+  
+
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -73,6 +78,11 @@ class _MainPageState extends State<MainPage> {
         : const PlaceholderPage(title: 'Manage Court'),
       const CourtFinderScreen(),
       const BlogPage(),
+      widget.user == null
+          ? const PlaceholderPage(title: 'Report')
+          : (widget.user!.isSuperuser
+              ? const AdminHomeScreen()
+              : const ComplaintScreen()),
           ? ManageCourtScreen(user: widget.user!)
           : const PlaceholderPage(title: 'Manage Court'),
       widget.user != null
@@ -108,7 +118,7 @@ class _MainPageState extends State<MainPage> {
               _buildNavItem(Icons.edit, 'Manage', 1),
               _buildCenterLogo(),
               _buildNavItem(Icons.article, 'Blog', 3),
-              _buildNavItem(Icons.comment, 'Complaint', 4),
+              _buildNavItem(Icons.comment, 'Report', 4),
             ],
           ),
         ),

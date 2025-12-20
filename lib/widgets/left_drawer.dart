@@ -8,6 +8,9 @@ import '/screens/admin_dashboard.dart';
 import '/screens/court-finder/court_finder_screen.dart';
 import 'package:court_finder_mobile/main.dart';
 
+import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';       // Untuk User Biasa
+import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart'; // Untuk Admin
+
 class LeftDrawer extends StatelessWidget {
   final UserEntry user;
   const LeftDrawer({super.key, required this.user});
@@ -84,7 +87,7 @@ class LeftDrawer extends StatelessWidget {
 
             _drawerItem(
               icon: Icons.report_gmailerrorred_outlined,
-              label: "Complaint",
+              label: "Report",
               onTap: () {
                 // TODO: Navigate to Complaint Page
               },
@@ -131,6 +134,27 @@ class LeftDrawer extends StatelessWidget {
                     ),
                   ),
                 ); 
+              },
+            ),
+
+            _drawerItem(
+              icon: Icons.warning_amber_rounded, // Icon yang cocok untuk report
+              label: "Report",
+              onTap: () {
+                // Cek apakah user adalah Admin (Superuser)
+                if (user.isSuperuser) {
+                  // Jika Admin, ke Halaman Dashboard Admin Complaint
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+                  );
+                } else {
+                  // Jika User Biasa, ke Halaman Complaint List User
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ComplaintScreen()),
+                  );
+                }
               },
             ),
 
