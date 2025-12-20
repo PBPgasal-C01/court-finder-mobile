@@ -8,18 +8,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 class ApiService {
   static const String baseUrl = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/courts';
 
-  Map<String, String> _getHeaders({String? token}) {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token != null) {
-      headers['Authorization'] = 'Bearer $token';
-    }
-
-    return headers;
-  }
-
   Future<List<Court>> searchCourts(CookieRequest request, CourtFilter filter) async {
     try {
       print("Sending request to: $baseUrl/api/search/");
@@ -47,15 +35,31 @@ class ApiService {
       print("Response Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body); // Decode JSON manual
-        if (data['courts'] != null) {
-          final List<dynamic> courtsJson = data['courts'];
-          return courtsJson.map((json) => Court.fromJson(json)).toList();
+        final decodedData = jsonDecode(response.body);
+
+        if (decodedData is! Map<String, dynamic>) {
+          print("Error: Response server bukan format JSON Object yang valid.");
+          return [];
         }
+
+        if (decodedData['courts'] == null) {
+          print("Warning: Key 'courts' tidak ditemukan atau null.");
+          return [];
+        }
+
+        if (decodedData['courts'] is! List) {
+          print("Error: Data 'courts' bukan berbentuk List.");
+          return [];
+        }
+
+        final List<dynamic> courtsJson = decodedData['courts'];
+        return courtsJson.map((json) => Court.fromJson(json)).toList();
+
       } else {
         print("Server Error: ${response.statusCode}");
+        print("Body: ${response.body}");
+        return [];
       }
-      return [];
 
     } catch (e) {
       print("Exception in searchCourts: $e");

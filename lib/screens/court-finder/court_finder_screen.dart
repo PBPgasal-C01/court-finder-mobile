@@ -282,26 +282,7 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
               ),
             ),
           ),
-
-          // LAYER 3: BUTTON BACK (Kiri Atas)
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
-            left: 16,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
-                ),
-                child: const Icon(Icons.arrow_back, color: Colors.black87),
-              ),
-            ),
-          ),
-
-          // LAYER 4: SEARCH BAR (Input Manual)
+          // LAYER 3: SEARCH BAR (Input Manual)
           Positioned(
             top:
                 MediaQuery.of(context).padding.top + 70, // Di bawah tombol back
@@ -340,7 +321,7 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
             ),
           ),
 
-          // LAYER 5: TOMBOL GPS (Jika peta digeser)
+          // LAYER 4: TOMBOL GPS (Jika peta digeser)
           if (_isMapMovedByUser)
             Positioned(
               right: 16,
@@ -352,10 +333,10 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
               ),
             ),
 
-          // LAYER 6: BOTTOM SHEET (Hasil Pencarian)
+          // LAYER 5: BOTTOM SHEET (Hasil Pencarian)
           Positioned.fill(child: _buildBottomSheet()),
 
-          // LAYER 7: LOADING INDICATOR
+          // LAYER 6: LOADING INDICATOR
           if (_isLoading)
             Positioned(
               top: MediaQuery.of(context).padding.top + 130,

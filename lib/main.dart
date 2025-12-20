@@ -13,6 +13,9 @@ import 'screens/court-finder/court_finder_screen.dart';
 import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';
 import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart';
 
+import 'package:court_finder_mobile/widgets/bottom_nav.dart';
+import 'package:court_finder_mobile/widgets/custom_app_bar.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -50,12 +53,25 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late int _selectedIndex;
+  int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex.clamp(0, 5).toInt();
+  }
+
+  String _getPageTitle(int index) {
+    switch (index) {
+      case 0: return "Home";
+      case 1: return "Manage Court";
+      case 2: return "Game Scheduler"; // Atau "Event"
+      case 3: return "Court Finder";
+      case 4: return "Blog";
+      case 5: return "Report";
+      default: return "Court Finder";
+    }
   }
 
   @override
@@ -69,7 +85,7 @@ class _MainPageState extends State<MainPage> {
       MyHomePage(user: widget.user!),
       ManageCourtScreen(user: widget.user!),
       GameSchedulerPage(user: widget.user!),
-      const CourtFinderScreen(),
+      CourtFinderScreen(),
       BlogPage(user: widget.user!),
       widget.user!.isSuperuser
           ? const AdminHomeScreen()
@@ -79,101 +95,30 @@ class _MainPageState extends State<MainPage> {
     final int activeIndex = _selectedIndex.clamp(0, pages.length - 1).toInt();
 
     return Scaffold(
+      key: _scaffoldKey,
       drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
-      body: IndexedStack(index: activeIndex, children: pages),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF6B8E72),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home, 'Home', 0),
-              _buildNavItem(Icons.edit, 'Manage', 1),
-              _buildNavItem(Icons.event, 'Event', 2),
-              _buildCenterLogo(),
-              _buildNavItem(Icons.article, 'Blog', 4),
-              _buildNavItem(Icons.comment, 'Report', 5),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final bool isSelected = _selectedIndex == index;
-    final Color color = isSelected ? Colors.white : Colors.white70;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+      // --- PASANG NAV ATAS DISINI ---
+      // Kita sembunyikan AppBar kalau di Home (Index 0) KARENA
+      // biasanya Home punya header besar sendiri (seperti di menu.dart kamu).
+      // TAPI kalau kamu mau Home juga pake navbar kecil ini, hapus kondisi "if" nya.
+      appBar: _selectedIndex == 0
+          ? null // Home pakai header sendiri (opsional)
+          : CustomTopAppBar(
+        title: _getPageTitle(_selectedIndex),
+        user: widget.user!,
+        scaffoldKey: _scaffoldKey,
       ),
-    );
-  }
 
-  Widget _buildCenterLogo() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = 3;
-        });
-      },
-      child: Transform.translate(
-        offset: const Offset(0, -10),
-        child: Container(
-          width: 65,
-          height: 65,
-          decoration: BoxDecoration(
-            color: const Color(0xFF4A6B4E),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipOval(
-              child: Image.asset(
-                'static/images/cflogo2.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.location_on,
-                    color: Colors.white,
-                    size: 35,
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
+      body: IndexedStack(index: _selectedIndex, children: pages),
+
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }
