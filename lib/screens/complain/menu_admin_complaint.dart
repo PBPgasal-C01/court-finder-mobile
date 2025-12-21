@@ -14,6 +14,7 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   final Color primaryGreen = const Color(0xFF6B8E72);
+
   String _selectedFilter = 'ALL';
   late Future<List<ComplaintEntry>> _complaintFuture;
 
@@ -43,7 +44,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         }
         return listComplaint;
       } else {
-        throw Exception('Gagal load data: ${response.statusCode}');
+        throw Exception('Failed to load data: ${response.statusCode}');
       }
     } catch (e) {
       print("Error fetching data: $e");

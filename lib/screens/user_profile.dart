@@ -1,13 +1,50 @@
 import 'package:court_finder_mobile/screens/menu.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+
 import '../models/user_entry.dart';
 import 'edit_profile.dart';
 import '../main.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final UserEntry user;
 
   const ProfilePage({super.key, required this.user});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late UserEntry user;
+  bool isRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // pakai user dari parameter sebagai initial data
+    user = widget.user;
+    // fetch ulang untuk sinkronisasi
+    fetchLatestUser();
+  }
+
+  Future<void> fetchLatestUser() async {
+    setState(() => isRefreshing = true);
+
+    final request = context.read<CookieRequest>();
+
+    final response = await request.get(
+      "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/",
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      user = UserEntry.fromJson(response); // overwrite data lama
+      isRefreshing = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +73,11 @@ class ProfilePage extends StatelessWidget {
             left: 20,
             child: GestureDetector(
               onTap: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  MainPage(user: user, initialIndex: 0),
-                            ),
-                          ),
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MainPage(user: user, initialIndex: 0),
+                ),
+              ),
               child: Container(
                 width: 50,
                 height: 50,
@@ -118,7 +154,11 @@ class ProfilePage extends StatelessWidget {
                             color: green,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
@@ -178,7 +218,10 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(value, style: const TextStyle(fontSize: 16)),
+                Text(
+                  value,
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
           )

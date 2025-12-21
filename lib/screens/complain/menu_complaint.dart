@@ -75,13 +75,13 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
 
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? "Berhasil dihapus")),
+          SnackBar(content: Text(response['message'] ?? "Successfully deleted")),
         );
         _refreshComplaints(isSilent: false); 
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response['message'] ?? "Gagal menghapus"),
+            content: Text(response['message'] ?? "Failed to delete"),
             backgroundColor: Colors.red,
           ),
         );
@@ -89,7 +89,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Terjadi kesalahan: $e"), backgroundColor: Colors.red),
+          SnackBar(content: Text("There's an error: $e"), backgroundColor: Colors.red),
         );
       }
     }

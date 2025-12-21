@@ -83,7 +83,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
         if (response['status'] == 'success') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Laporan berhasil diperbarui!"),
+              content: Text("Report is successfully updated!"),
               backgroundColor: Colors.green,
             ),
           );
@@ -100,7 +100,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
+        ).showSnackBar(SnackBar(content: Text("There\'s an error : $e")));
       } finally {
         if (mounted) {
           setState(() {
@@ -170,7 +170,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel("Problem Title:"),
+                    _buildLabel("Problem:"),
                     _buildReadOnlyField(widget.complaint.masalah),
                     const SizedBox(height: 20),
 
@@ -264,7 +264,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Pilih status laporan';
+                            return 'Choose report\'s status';
                           }
                           return null;
                         },
@@ -398,7 +398,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
         maxLines: maxLines,
         validator: (value) {
           if (isRequired && (value == null || value.isEmpty)) {
-            return 'Field ini tidak boleh kosong';
+            return 'This field can\'t be empty';
           }
           return null;
         },
