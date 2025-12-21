@@ -5,6 +5,8 @@ import 'package:court_finder_mobile/screens/complain/complaint_entryform.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:async';
+import 'dart:convert';
 
 class ComplaintScreen extends StatefulWidget {
   const ComplaintScreen({super.key});
@@ -15,6 +17,23 @@ class ComplaintScreen extends StatefulWidget {
 
 class _ComplaintScreenState extends State<ComplaintScreen> {
   final Color primaryGreen = const Color(0xFF6B8E72);
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); 
+    super.dispose();
+  }
 
   Future<void> _refreshComplaints() async {
     setState(() {});
@@ -22,13 +41,18 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
   }
 
   Future<List<ComplaintEntry>> fetchComplaints(CookieRequest request) async {
-    // ... logic fetch tetap sama (copy dari file lamamu) ...
-    String baseUrl = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
+    String baseUrl = kIsWeb
+        ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id'
+        : 'http://10.0.2.2:8000';
+        
     var url = '$baseUrl/complain/json-flutter/';
     var response = await request.get(url);
+    
     List<ComplaintEntry> list = [];
     for (var d in response) {
-      if (d != null) list.add(ComplaintEntry.fromJson(d));
+      if (d != null) {
+        list.add(ComplaintEntry.fromJson(d));
+      }
     }
     return list;
   }
@@ -59,10 +83,12 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
         child: FutureBuilder(
           future: fetchComplaints(request),
           builder: (context, AsyncSnapshot<List<ComplaintEntry>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting)
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
-            if (!snapshot.hasData || snapshot.data!.isEmpty)
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(child: Text("No reports yet"));
+            }
 
             return ListView.builder(
               padding: const EdgeInsets.only(top: 16, bottom: 80),
@@ -81,12 +107,65 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                     ),
                   );
                 }
+                
                 final complaint = snapshot.data![index - 1];
+                
                 return ComplaintCard(
                   complaint: complaint,
-                  onTap: () {},
+                  onTap: () {
+                  },
                   onDelete: () async {
-                    // ... logic delete ...
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Delete Report'),
+                        content: const Text('Are you sure you want to delete this report? '),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    ) ?? false;
+
+                    if (!confirm || !mounted) return;
+
+                    try {
+                      final baseUrl = kIsWeb
+                          ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id'
+                          : 'http://10.0.2.2:8000';
+
+                      final response = await request.postJson(
+                        '$baseUrl/complain/delete-flutter/${complaint.id}/',
+                        jsonEncode({}), 
+                      );
+
+                      if (!mounted) return;
+
+                      if (response['status'] == 'success') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response['message'] ?? "Berhasil dihapus")),
+                        );
+                        _refreshComplaints(); 
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(response['message'] ?? "Gagal menghapus"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Terjadi kesalahan: $e"), backgroundColor: Colors.red),
+                      );
+                    }
                   },
                 );
               },
