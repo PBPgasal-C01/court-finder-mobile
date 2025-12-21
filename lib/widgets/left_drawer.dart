@@ -9,6 +9,7 @@ import 'package:court_finder_mobile/main.dart';
 import 'package:court_finder_mobile/screens/game_scheduler/game_scheduler_page.dart';
 import 'package:court_finder_mobile/screens/complain/menu_complaint.dart'; // Untuk User Biasa
 import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart'; // Untuk Admin
+import '/screens/welcome_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   final UserEntry user;
@@ -198,7 +199,7 @@ class LeftDrawer extends StatelessWidget {
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  MaterialPageRoute(builder: (_) => const WelcomePage()),
                   (route) => false,
                 );
               },

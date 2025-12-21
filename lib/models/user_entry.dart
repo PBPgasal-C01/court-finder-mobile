@@ -33,7 +33,7 @@ class UserEntry {
 
   factory UserEntry.fromJson(Map<String, dynamic> json) => UserEntry(
         email: json["email"],
-        username: json["username"],
+        username: json["username"] ?? "-",
         photo: json["photo"], // may be null
         preference: json["preference"],
         isSuperuser: json["is_superuser"],

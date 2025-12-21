@@ -222,6 +222,7 @@ class _BlogPageState extends State<BlogPage> {
       // Floating Action Button hanya untuk Superuser
       floatingActionButton: (widget.user?.isSuperuser ?? false)
           ? FloatingActionButton(
+              heroTag: null,
               onPressed: () async {
                 final result = await Navigator.push(
                   context,

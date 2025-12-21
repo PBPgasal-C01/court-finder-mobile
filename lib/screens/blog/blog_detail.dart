@@ -168,6 +168,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       backgroundColor: const Color(0xFF6B8E72),
       floatingActionButton: (widget.user?.isSuperuser ?? false)
           ? FloatingActionButton(
+              heroTag: null,
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
