@@ -58,9 +58,9 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 ## 1. Modul Autentikasi (Alfino) 🔐
 
-- **Fitur Autentikasi:** Registrasi/login menggunakan email, Google, atau social login , serta pengaturan profil user (nama, foto, preferensi main indoor/outdoor).
+- **Fitur Autentikasi:** Registrasi/login menggunakan email atau Google, serta pengaturan profil user (nama, foto, preferensi main indoor/outdoor).
 
-|                | Registered User                                                   | Admin                                  |
+|                | User                                                              | Admin                                  |
 | -------------- | ----------------------------------------------------------------- | -------------------------------------- |
 | Peran Pengguna | Dapat registrasi/login, mengatur profil (nama, foto, preferensi). | Dapat mengelola akun user (hapus/ban). |
 
@@ -70,9 +70,9 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 - **Fitur Court Finder:** Menyediakan map interaktif untuk mencari lapangan, dilengkapi filter,favorit, dan sorting.
 
-|                | Registered User                                                                                   | Admin                         |
-| -------------- | ------------------------------------------------------------------------------------------------- | ----------------------------- |
-| Peran Pengguna | Dapat melihat map dan info dasar court, serta menggunakan filter, sorting, dan menandai favorite. | Sama seperti Registered User. |
+|                | User                                                                                              | Admin              |
+| -------------- | ------------------------------------------------------------------------------------------------- | ------------------ |
+| Peran Pengguna | Dapat melihat map dan info dasar court, serta menggunakan filter, sorting, dan menandai favorite. | Sama seperti User. |
 
 ---
 
@@ -80,19 +80,19 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 - **CRUD Court:** Memungkinkan user (pemilik lapangan) untuk membuat, melihat, mengedit, dan menghapus (CRUD) daftar lapangan yang mereka miliki.
 
-|                | Registered User                                                                           | Admin                         |
-| -------------- | ----------------------------------------------------------------------------------------- | ----------------------------- |
-| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) penuh pada lapangan miliknya sendiri. | Sama seperti Registered User. |
+|                | User                                                                                      | Admin              |
+| -------------- | ----------------------------------------------------------------------------------------- | ------------------ |
+| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) penuh pada lapangan miliknya sendiri. | Sama seperti User. |
 
 ---
 
 ## 4. Modul Blog (Tristan) 📒
 
-- **CRUD Blog:** Pengguna dapat melihat artikel, dan menambahkan ke my favourite. Admin dapat melakukan semua fitur pengguna serta membuat, mengedit, dan menghapus artikel.
+- **CRUD Blog:** Pengguna dapat melihat artikel, dan menambahkan ke favorit Admin dapat melakukan semua fitur pengguna serta membuat, mengedit, dan menghapus artikel.
 
-|                | Registered User                                   | Admin                                                                                    |
-| -------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Peran Pengguna | Dapat melihat artikel, dan menambahkan favourite. | Semua fitur Registered User + Dapat membuat, mengedit dan menghapus artikel tanpa batas. |
+|                | User                                            | Admin                                                                         |
+| -------------- | ----------------------------------------------- | ----------------------------------------------------------------------------- |
+| Peran Pengguna | Dapat melihat artikel, dan menambahkan favorit. | Semua fitur User + Dapat membuat, mengedit dan menghapus artikel tanpa batas. |
 
 ---
 
@@ -100,9 +100,9 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 - **Fitur Game Scheduler:** Membuat dan bergabung ke jadwal game yang ada dengan opsi public atau private, dan terintegrasi dengan kalender.
 
-|                | Registered User                                                                                                                                   | Admin                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya *noted: di models ada partisipan sama creator) | Sama seperti Registered user |
+|                | User                                                                                                                                                                                                                    | Admin             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya \*noted: di models ada partisipan sama creator) | Sama seperti User |
 
 ---
 
@@ -110,32 +110,32 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 - **Fitur Laporan:** pelaporan masalah terkait lapangan (ring rusak, lampu mati, lantai licin), dengan status laporan yang dapat diperbarui. User bisa create, read, & delete report dan admin bisa update & read report
 
-|                | Registered User                         | Admin                                                                                                  |
-| -------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+|                | User                                                                                             | Admin                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
 | Peran Pengguna | Dapat melapor masalah terkait lapangan & menghapus laporan selagi masih dalam status "In Review" | Dapat merespons laporan, memperbarui status (In Review, In Process, Done), dan memberi komentar pada semua report. |
 
 ---
 
 # 👤 Jenis Pengguna Aplikasi
 
-### 🏃‍♂️ Registered User (pemain)
+### 🏃‍♂️ User
 
-- Bisa lihat map dan info dasar court
-- Bisa lihat rating dan review lapangan
-- Bisa lihat game scheduler
-- Bisa baca blog
-- Bisa lihat jadwal event
-- Bisa buat/join game dan event
-- Bisa kasih rating & review lapangan
-- Bisa upload foto/video lapangan
-- Bisa report masalah lapangan
-- Bisa update profil dan preferensi
+- Bisa melihat peta dan informasi dasar lapangan
+- Bisa melihat rating dan ulasan lapangan
+- Bisa melihat jadwal permainan
+- Bisa membaca blog
+- Bisa melihat jadwal event
+- Bisa membuat atau mengikuti game dan event
+- Bisa memberikan rating dan ulasan lapangan
+- Bisa mengunggah foto/video lapangan
+- Bisa melaporkan masalah lapangan
+- Bisa memperbarui profil dan preferensi
 - Bisa menambahkan blog favorit
 
 ### ⚡ Admin
 
-- Semua fitur Registered User
-- Kelola data lapangan (buat, edit, hapus)
-- Respon report (ubah status/beri catatan)
-- Kelola user (hapus akun, ban)
-- kelola blog (create,edit dan delete)
+- Semua fitur User
+- Mengelola data lapangan (membuat, mengedit, menghapus)
+- Merespons laporan (mengubah status/memberi catatan)
+- Mengelola pengguna (menghapus akun, memblokir)
+- Mengelola blog (membuat, mengedit, menghapus)
