@@ -50,7 +50,7 @@ jobs:
         run: |
           if [ -z "$KEY_ALIAS" ]; then KEY_ALIAS="release"; fi
           cat > android/key.properties <<EOF
-          storeFile=app/release-keystore.jks
+          storeFile=release-keystore.jks
           storePassword=$KEY_PASSWORD
           keyPassword=$KEY_PASSWORD
           keyAlias=$KEY_ALIAS
