@@ -159,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => ProfilePage(user: user)),
+                    MaterialPageRoute(builder: (_) => ProfilePage(user: user,)),
                   );
                 },
                 child: CircleAvatar(

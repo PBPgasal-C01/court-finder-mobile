@@ -192,9 +192,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ProfilePage(
-                        user: user
-                      ),
+                      builder: (_) => ProfilePage(user: user),
                     ),
                   );
                 },
