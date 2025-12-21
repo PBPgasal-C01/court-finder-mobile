@@ -10,7 +10,8 @@
 
 ---
 
-[![Build Status](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec/status.svg?token=OJYoiOqufHzitDOSQlYIOA&branch=main)](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec)
+[![Build Status](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec/status.svg?token=OJYoiOqufHzitDOSQlYIOA&branch=main)](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec)  
+Download aplikasi versi terbaru: [Download APK]()
 
 ## 📝 Deskripsi
 
@@ -37,10 +38,7 @@
 | 2406405304 | Alfino Ahmad Feriza      | PJ Developer      | Autentikasi                 |
 | 2406358472 | Tristan Rasheed Satria   | PJ Developer      | Blog                        |
 
-## 🔗 Link PWS
-
-https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/host:8000
-/
+## 🔗 Link Video Youtube
 
 ## 🎨 Link Design
 
@@ -90,9 +88,9 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 - **CRUD Blog:** Pengguna dapat melihat artikel, dan menambahkan ke favorit Admin dapat melakukan semua fitur pengguna serta membuat, mengedit, dan menghapus artikel.
 
-|                | User                                            | Admin                                                                         |
-| -------------- | ----------------------------------------------- | ----------------------------------------------------------------------------- |
-| Peran Pengguna | Dapat melihat artikel, dan menambahkan favorit. | Semua fitur User + Dapat membuat, mengedit dan menghapus artikel tanpa batas. |
+|                | User                                            | Admin                                                                                |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Peran Pengguna | Dapat melihat artikel, dan menambahkan favorit. | Semua fitur User ditambah Dapat membuat, mengedit dan menghapus artikel tanpa batas. |
 
 ---
 
