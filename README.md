@@ -14,7 +14,7 @@
 
 ## 📝 Deskripsi
 
-**Court Finder** adalah aplikasi yang membantu masyarakat umum menemukan dan memantau ketersediaan fasilitas/lapangan olahraga terdekat secara real-time, menjawab kesulitan pemain kasual maupun komunitas yang sering harus datang langsung atau bergantung pada informasi tercecer di internet maupun grup chat. Selain menampilkan lokasi, aplikasi juga memberikan detail kondisi lapangan (indoor/outdoor, gratis/berbayar, material lantai,dll), bisa bermain dengan orang lain dan bisa mengecek ada event apa aja yang tersedia.Selain itu, Court Finder juga berfungsi sebagai platform bagi pemilik lapangan untuk mendaftarkan, mengelola, dan mempromosikan fasilitas olahraga mereka ke audiens yang lebih luas.
+**Court Finder** Court Finder adalah aplikasi yang membantu masyarakat umum menemukan dan memantau ketersediaan fasilitas/lapangan olahraga terdekat secara real-time, menjawab kesulitan pemain kasual maupun komunitas yang sering harus datang langsung atau bergantung pada informasi tercecer di internet maupun grup chat. Selain menampilkan lokasi, aplikasi juga memberikan detail kondisi lapangan (indoor/outdoor, gratis/berbayar, material lantai, dll), bisa bermain dengan orang lain dan bisa mengecek ada event apa aja yang tersedia. Selain itu, Court Finder juga berfungsi sebagai platform bagi pemilik lapangan untuk mendaftarkan, mengelola, dan mempromosikan fasilitas olahraga mereka ke audiens yang lebih luas.
 
 ## 📱 Alur Pengintegrasian dengan Aplikasi Web
 
@@ -98,21 +98,21 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 ## 5. Modul Game Scheduler (Cari Teman Main) (Jihan) 🏀
 
-- **Fitur Game Scheduler:** Membuat dan bergabung dengan event, dengan opsi public/private, notifikasi, dan integrasi kalender.
+- **Fitur Game Scheduler:** Membuat dan bergabung ke jadwal game yang ada dengan opsi public atau private, dan terintegrasi dengan kalender.
 
 |                | Registered User                                                                                                                                   | Admin                  |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| Peran Pengguna | Bisa Create, Edit, Delete (logged user = creator, creator bisa join event bisa gak join event nya \*noted: di models ada partisipan sama creator) | sama kayak logged user |
+| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya *noted: di models ada partisipan sama creator) | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya *noted: di models ada partisipan sama creator) |
 
 ---
 
 ## 6. Modul Complaint & Report System (Zhafira) 🚨
 
-- **CRUD Laporan:** Fitur pelaporan masalah terkait lapangan (ring rusak, lampu mati, lantai licin), dengan status laporan yang dapat diperbarui. User bisa create, read, & delete report dan admin bisa update & read report
+- **Fitur Laporan:** pelaporan masalah terkait lapangan (ring rusak, lampu mati, lantai licin), dengan status laporan yang dapat diperbarui. User bisa create, read, & delete report dan admin bisa update & read report
 
 |                | Registered User                         | Admin                                                                                                  |
 | -------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Peran Pengguna | Dapat melapor masalah terkait lapangan. | Dapat merespons laporan, memperbarui status (ditinjau, diproses, selesai), dan mengelola semua report. |
+| Peran Pengguna | Dapat melapor masalah terkait lapangan & menghapus laporan selagi masih dalam status "In Review" | Dapat merespons laporan, memperbarui status (In Review, In Process, Done), dan mengelola semua report. |
 
 ---
 
