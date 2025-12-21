@@ -9,7 +9,7 @@
 
 
     <application
-        android:label="court_finder_mobile"
+        android:label="Court Finder"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
