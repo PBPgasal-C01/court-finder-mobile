@@ -72,7 +72,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - static/images/cflogo2.png
+    - static/images/
     - assets/images/
   # - images/a_dot_ham.jpeg
 

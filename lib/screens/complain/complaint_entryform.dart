@@ -47,7 +47,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Gagal memilih gambar: $e")));
+      ).showSnackBar(SnackBar(content: Text("Failed to pick an image: $e")));
     }
   }
 
@@ -63,13 +63,13 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              "Pilih Sumber Gambar",
+              "Pick a source image",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             ListTile(
               leading: const Icon(Icons.camera_alt, color: Color(0xFF3F5940)),
-              title: const Text("Kamera"),
+              title: const Text("Camera"),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -80,7 +80,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                 Icons.photo_library,
                 color: Color(0xFF3F5940),
               ),
-              title: const Text("Galeri"),
+              title: const Text("Gallery"),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -125,7 +125,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Laporan berhasil disimpan!"),
+              content: Text("Report is successfully saved!"),
               backgroundColor: Colors.green,
             ),
           );
@@ -134,7 +134,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Gagal: ${response['message']}"),
+              content: Text("fail: ${response['message']}"),
               backgroundColor: Colors.red,
             ),
           );
@@ -143,7 +143,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
+        ).showSnackBar(SnackBar(content: Text("There's an error: $e")));
       } finally {
         if (mounted) {
           setState(() {
@@ -204,7 +204,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
                       hint: "Example: Football Field A",
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel("Problem Title"),
+                    _buildLabel("Problem"),
                     _buildTextField(
                       controller: _masalahController,
                       hint: "Example : The goal is damaged",
@@ -408,7 +408,7 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
         maxLines: maxLines,
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Field ini tidak boleh kosong';
+            return 'This field can\'t be empty';
           }
           return null;
         },
