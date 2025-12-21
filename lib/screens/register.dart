@@ -32,6 +32,8 @@ class _RegisterPageState extends State<RegisterPage> {
   File? _selectedImage;
   String _preference = "Both";
   bool _isSigningIn = false;
+  bool _isRegisterPressed = false;
+
 
   Future<void> _handleGoogleLogin(BuildContext context) async {
     final request = context.read<CookieRequest>();
@@ -317,7 +319,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // OR
                   const Text(
-                    "OR LOG IN WITH EMAIL",
+                    "OR SIGN UP WITH EMAIL",
                     style: TextStyle(
                       fontSize: 16,
                       color: Color(0xFFA1A4B2),
@@ -336,7 +338,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         buildInputBox(
                           controller: _usernameController,
                           hint: "Display Name",
-                          validator: null,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return "Display name is required";
+                            }
+                            return null;
+                          },
                         ),
 
                         const SizedBox(height: 20),
@@ -355,7 +362,15 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
 
                         // PASSWORD
-                        buildPasswordBox(_password1Controller),
+                        buildPasswordBox(
+                          _password1Controller,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return "Password is required";
+                            }
+                            return null;
+                          },
+                        ),
 
                         const SizedBox(height: 20),
 
@@ -441,58 +456,37 @@ class _RegisterPageState extends State<RegisterPage> {
 
                         const SizedBox(height: 25),
 
-                        // PRIVACY POLICY CHECK
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: true,
-                              activeColor: Color(0xFF547254),
-                              onChanged: (v) {},
-                            ),
-                            Expanded(
-                              child: RichText(
-                                text: const TextSpan(
-                                  text: "I have read the ",
-                                  style: TextStyle(
-                                    color: Color(0xFFA1A4B2),
-                                    fontSize: 14,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: "Privacy Policy",
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 30),
-
                         // REGISTER BUTTON
-                        GestureDetector(
+                        InkWell(
+                          borderRadius: BorderRadius.circular(54),
+                          onHighlightChanged: (pressed) {
+                            setState(() {
+                              _isRegisterPressed = pressed;
+                            });
+                          },
                           onTap: registerUser,
-                          child: Container(
+                          child: Ink(
                             width: double.infinity,
                             height: 68,
                             decoration: BoxDecoration(
-                              color: Color(0xFFF6FAF6),
+                              color: _isRegisterPressed
+                                  ? const Color(0xFFE1EFE1) // pressed color
+                                  : const Color(0xFFF6FAF6), // normal color
                               borderRadius: BorderRadius.circular(54),
                               border: Border.all(
-                                  color: Color(0xFF547254), width: 1.8),
+                                color: const Color(0xFF547254),
+                                width: 1.8,
+                              ),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                "LOG IN",
+                                "SIGN UP",
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF547254),
+                                  color: _isRegisterPressed
+                                      ? const Color(0xFF3F6E48) // pressed text
+                                      : const Color(0xFF547254),
                                 ),
                               ),
                             ),

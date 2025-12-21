@@ -40,6 +40,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isSigningIn = false;
+  bool _isLoginPressed = false;
+
 
   Future<void> _handleGoogleLogin(BuildContext context) async {
     final request = context.read<CookieRequest>();
@@ -315,8 +317,14 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 25),
 
-                  // LOGIN BUTTON (your logic preserved!)
-                  GestureDetector(
+                  // LOGIN BUTTON
+                  InkWell(
+                    borderRadius: BorderRadius.circular(54),
+                    onHighlightChanged: (pressed) {
+                      setState(() {
+                        _isLoginPressed = pressed;
+                      });
+                    },
                     onTap: () async {
                       String username = _usernameController.text;
                       String password = _passwordController.text;
@@ -338,8 +346,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  MainPage(user: user, initialIndex: 0),
+                              builder: (_) => MainPage(user: user, initialIndex: 0),
                             ),
                           );
                           ScaffoldMessenger.of(context)
@@ -358,49 +365,44 @@ class _LoginPageState extends State<LoginPage> {
                             content: Text(response['message']),
                             actions: [
                               TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("OK"))
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK"),
+                              )
                             ],
                           ),
                         );
                       }
                     },
-                    child: Container(
+                    child: Ink(
                       width: double.infinity,
                       height: 68,
                       decoration: BoxDecoration(
-                        color: Color(0xFFF6FAF6),
+                        color: _isLoginPressed
+                            ? const Color(0xFFE1EFE1) // pressed color
+                            : const Color(0xFFF6FAF6), // normal color
                         borderRadius: BorderRadius.circular(54),
                         border: Border.all(
-                          color: Color(0xFF547254),
+                          color: const Color(0xFF547254),
                           width: 1.8,
                         ),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           "LOG IN",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF547254),
+                            color: _isLoginPressed
+                                ? const Color(0xFF3F6E48) // pressed text
+                                : const Color(0xFF547254),
                           ),
                         ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 16),
 
-                  // FORGOT PASSWORD
-                  const Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF3F414E),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
 
                   // SIGN UP REDIRECT
                   GestureDetector(
