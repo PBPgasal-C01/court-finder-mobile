@@ -28,6 +28,13 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
   final ApiService _apiService = ApiService();
   final LocationService _locationService = LocationService();
 
+  bool _isAuthenticated(CookieRequest request) {
+    if (request.loggedIn) return true;
+    // Google Sign-In flow uses request.post() (not request.login()), so
+    // CookieRequest.loggedIn may stay false even though session cookies exist.
+    return request.cookies.containsKey('sessionid');
+  }
+
   // --- Controllers ---
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
@@ -162,7 +169,7 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
 
         if (_selectedTab == 1) {
           // --- TAB BOOKMARK ---
-          if (!request.loggedIn) {
+          if (!_isAuthenticated(request)) {
             courts = [];
           } else {
             // PERUBAHAN DISINI:
@@ -213,7 +220,7 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
     final request = context.read<CookieRequest>();
 
     // --- CEK LOGIN SAAT KLIK BINTANG ---
-    if (!request.loggedIn) {
+    if (!_isAuthenticated(request)) {
       _showLoginDialog(); // Panggil Popup
       return; // Stop, jangan lanjut request ke server
     }
@@ -422,7 +429,7 @@ class _CourtFinderScreenState extends State<CourtFinderScreen> {
           final request = context.read<CookieRequest>();
 
           // --- CEK LOGIN UNTUK TAB BOOKMARK ---
-          if (index == 1 && !request.loggedIn) {
+          if (index == 1 && !_isAuthenticated(request)) {
             _showLoginDialog(); // Panggil Popup
             return; // Stop, jangan ganti tab
           }
