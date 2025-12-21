@@ -2,6 +2,7 @@ import 'package:court_finder_mobile/screens/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 import '/models/user_entry.dart';
 import '../models/court-finder/court.dart' as cf;
@@ -26,6 +27,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<cf.Court>>? _courtsFuture;
   final List<String> _selectedCourtTypes = [];
+
+  final List<String> _bannerImages = const [
+    'static/images/banner_badminton.jpg',
+    'static/images/banner_basketball.jpg',
+    'static/images/banner_futsal.jpg',
+    'static/images/banner_tennis.jpg',
+    'static/images/banner_volleyball.jpg',
+  ];
 
   @override
   void initState() {
@@ -62,20 +71,56 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    final double screenHeight = MediaQuery.sizeOf(context).height;
+    final double courtListHeight = (screenHeight * 0.55)
+        .clamp(320.0, 520.0)
+        .toDouble();
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF5F5F5),
       drawer: LeftDrawer(user: user),
       // ============================ BODY ============================
-      body: Column(
-        children: [
-          _buildHeader(context, request),
-          const SizedBox(height: 20),
-          _buildPopularSports(),
-          const SizedBox(height: 20),
-          Expanded(child: _buildCourtList(request)),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: _buildHeader(context, request)),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          SliverToBoxAdapter(child: _buildBannerCarousel()),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+          SliverToBoxAdapter(child: _buildBannerTagline()),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
+          SliverToBoxAdapter(child: _buildPopularSports()),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: courtListHeight,
+              child: _buildCourtList(request),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBannerCarousel() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: _AutoBannerCarousel(
+        images: _bannerImages,
+        height: 170,
+        borderRadius: 18,
+      ),
+    );
+  }
+
+  static Widget _buildBannerTagline() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Text(
+        'Easily find and book courts for any sport across Indonesia — all on one platform.',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.grey[700], fontSize: 14, height: 1.35),
       ),
     );
   }
@@ -381,6 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 await _courtsFuture;
               },
               child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(14),
                 itemCount: filtered.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -476,6 +522,114 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _AutoBannerCarousel extends StatefulWidget {
+  final List<String> images;
+  final double height;
+  final double borderRadius;
+
+  const _AutoBannerCarousel({
+    required this.images,
+    required this.height,
+    required this.borderRadius,
+  });
+
+  @override
+  State<_AutoBannerCarousel> createState() => _AutoBannerCarouselState();
+}
+
+class _AutoBannerCarouselState extends State<_AutoBannerCarousel> {
+  late final PageController _controller;
+  Timer? _timer;
+  int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController();
+
+    if (widget.images.length > 1) {
+      _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+        if (!mounted) return;
+        _index = (_index + 1) % widget.images.length;
+        _controller.animateToPage(
+          _index,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.images.isEmpty) return const SizedBox.shrink();
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: SizedBox(
+        height: widget.height,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            PageView.builder(
+              controller: _controller,
+              itemCount: widget.images.length,
+              onPageChanged: (i) {
+                setState(() => _index = i);
+              },
+              itemBuilder: (context, i) {
+                return Image.asset(
+                  widget.images[i],
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.white70,
+                        size: 40,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(widget.images.length, (i) {
+                    final selected = i == _index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      height: 8,
+                      width: selected ? 18 : 8,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(selected ? 0.95 : 0.6),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
