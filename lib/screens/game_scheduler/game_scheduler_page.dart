@@ -23,15 +23,29 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
   String? _selectedSport;
   final Color primaryGreen = const Color(0xFF6B8E72);
 
+  bool _isAuthenticated(CookieRequest request) {
+    if (request.loggedIn) return true;
+    return request.cookies.containsKey('sessionid');
+  }
+
   final Map<String, String> _sportOptions = {
-    'basketball': 'Basketball', 'futsal': 'Futsal', 'soccer': 'Soccer',
-    'badminton': 'Badminton', 'tennis': 'Tennis', 'baseball': 'Baseball',
-    'volleyball': 'Volleyball', 'padel': 'Padel', 'golf': 'Golf',
-    'football': 'Football', 'softball': 'Softball', 'table_tennis': 'Table Tennis',
+    'basketball': 'Basketball',
+    'futsal': 'Futsal',
+    'soccer': 'Soccer',
+    'badminton': 'Badminton',
+    'tennis': 'Tennis',
+    'baseball': 'Baseball',
+    'volleyball': 'Volleyball',
+    'padel': 'Padel',
+    'golf': 'Golf',
+    'football': 'Football',
+    'softball': 'Softball',
+    'table_tennis': 'Table Tennis',
   };
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    String url = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/json/';
+    String url =
+        'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/event_list/json/';
     if (_showMyEventsOnly) url += '?only_me=true';
 
     final response = await request.get(url);
@@ -42,8 +56,14 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
 
     return listEvents.where((element) {
       bool matchType = element.fields.eventType.toLowerCase() == _activeType;
-      bool matchSearch = _searchQuery.isEmpty || element.fields.title.toLowerCase().contains(_searchQuery.toLowerCase());
-      bool matchSport = _selectedSport == null || element.fields.sportType.toLowerCase() == _selectedSport;
+      bool matchSearch =
+          _searchQuery.isEmpty ||
+          element.fields.title.toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          );
+      bool matchSport =
+          _selectedSport == null ||
+          element.fields.sportType.toLowerCase() == _selectedSport;
       return matchType && matchSearch && matchSport;
     }).toList();
   }
@@ -51,20 +71,26 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    final isAuthenticated = _isAuthenticated(request);
 
     return Scaffold(
       backgroundColor: Colors.white,
 
-      floatingActionButton: request.loggedIn
+      floatingActionButton: isAuthenticated
           ? FloatingActionButton(
-        heroTag: null,
-        backgroundColor: primaryGreen,
-        onPressed: () async {
-          await Navigator.push(context, MaterialPageRoute(builder: (_) => const GameSchedulerFormPage()));
-          setState((){});
-        },
-        child: const Icon(Icons.add, color: Colors.white),
-      )
+              heroTag: null,
+              backgroundColor: primaryGreen,
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const GameSchedulerFormPage(),
+                  ),
+                );
+                setState(() {});
+              },
+              child: const Icon(Icons.add, color: Colors.white),
+            )
           : null,
 
       body: Column(
@@ -80,24 +106,40 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
                     Expanded(
                       child: Container(
                         height: 45,
-                        decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: TextField(
                           controller: _searchController,
                           textAlignVertical: TextAlignVertical.center,
-                          onSubmitted: (value) => setState(() => _searchQuery = value),
+                          onSubmitted: (value) =>
+                              setState(() => _searchQuery = value),
                           decoration: InputDecoration(
                             hintText: "Search event...",
-                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Colors.grey,
+                            ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 10),
-                    _buildSmallButton("PUBLIC", _activeType == 'public' ? primaryGreen : Colors.grey.shade300, () {
-                      setState(() => _activeType = 'public');
-                    }, _activeType == 'public'),
+                    _buildSmallButton(
+                      "PUBLIC",
+                      _activeType == 'public'
+                          ? primaryGreen
+                          : Colors.grey.shade300,
+                      () {
+                        setState(() => _activeType = 'public');
+                      },
+                      _activeType == 'public',
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -116,23 +158,51 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: _selectedSport,
-                            hint: const Text("All Sports", style: TextStyle(color: Colors.white, fontSize: 13)),
+                            hint: const Text(
+                              "All Sports",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
                             dropdownColor: primaryGreen,
-                            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                            style: const TextStyle(color: Colors.white, fontSize: 13),
-                            onChanged: (val) => setState(() => _selectedSport = val),
+                            icon: const Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.white,
+                            ),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                            onChanged: (val) =>
+                                setState(() => _selectedSport = val),
                             items: [
-                              const DropdownMenuItem(value: null, child: Text("All Sports")),
-                              ..._sportOptions.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))),
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text("All Sports"),
+                              ),
+                              ..._sportOptions.entries.map(
+                                (e) => DropdownMenuItem(
+                                  value: e.key,
+                                  child: Text(e.value),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 10),
-                    _buildSmallButton("PRIVATE", _activeType == 'private' ? primaryGreen : Colors.grey.shade300, () {
-                      setState(() => _activeType = 'private');
-                    }, _activeType == 'private'),
+                    _buildSmallButton(
+                      "PRIVATE",
+                      _activeType == 'private'
+                          ? primaryGreen
+                          : Colors.grey.shade300,
+                      () {
+                        setState(() => _activeType = 'private');
+                      },
+                      _activeType == 'private',
+                    ),
                   ],
                 ),
               ],
@@ -143,9 +213,17 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildFilterButton("ALL EVENTS", !_showMyEventsOnly, () => setState(() => _showMyEventsOnly = false)),
+              _buildFilterButton(
+                "ALL EVENTS",
+                !_showMyEventsOnly,
+                () => setState(() => _showMyEventsOnly = false),
+              ),
               const SizedBox(width: 15),
-              _buildFilterButton("MY EVENTS", _showMyEventsOnly, () => setState(() => _showMyEventsOnly = true)),
+              _buildFilterButton(
+                "MY EVENTS",
+                _showMyEventsOnly,
+                () => setState(() => _showMyEventsOnly = true),
+              ),
             ],
           ),
 
@@ -154,33 +232,41 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
           // LIST DATA
           Expanded(
             child: FutureBuilder(
-                future: fetchEvents(request),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No events found.", style: TextStyle(color: Colors.grey)));
-                  }
-                  return GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 80),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.58,
-                      ),
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (_, index) {
-                        return EventCard(
-                          event: snapshot.data![index],
-                          isLoggedIn: request.loggedIn,
-                          showActions: _showMyEventsOnly,
-                          user: widget.user,
-                          currentUserId: request.loggedIn ? request.jsonData['id'] : null,
-                          onRefresh: () => setState((){}),
-                        );
-                      }
+              future: fetchEvents(request),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  return const Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No events found.",
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   );
                 }
+                return GridView.builder(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 80),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.58,
+                  ),
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (_, index) {
+                    return EventCard(
+                      event: snapshot.data![index],
+                      isLoggedIn: isAuthenticated,
+                      showActions: _showMyEventsOnly,
+                      user: widget.user,
+                      currentUserId: isAuthenticated
+                          ? request.jsonData['id']
+                          : null,
+                      onRefresh: () => setState(() {}),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -188,13 +274,30 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
     );
   }
 
-  Widget _buildSmallButton(String text, Color bgColor, VoidCallback onTap, bool isActive) {
+  Widget _buildSmallButton(
+    String text,
+    Color bgColor,
+    VoidCallback onTap,
+    bool isActive,
+  ) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 80, height: 40, alignment: Alignment.center,
-        decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12)),
-        child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isActive ? Colors.white : Colors.black54)),
+        width: 80,
+        height: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: isActive ? Colors.white : Colors.black54,
+          ),
+        ),
       ),
     );
   }
@@ -209,7 +312,13 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: primaryGreen),
         ),
-        child: Text(text, style: TextStyle(fontWeight: FontWeight.bold, color: isActive ? Colors.white : primaryGreen)),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isActive ? Colors.white : primaryGreen,
+          ),
+        ),
       ),
     );
   }
