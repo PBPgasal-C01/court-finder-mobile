@@ -11,7 +11,7 @@
 ---
 
 [![Build Status](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec/status.svg?token=OJYoiOqufHzitDOSQlYIOA&branch=main)](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec)  
-Download aplikasi versi terbaru: [Download APK]()
+Download aplikasi versi terbaru: [Download APK](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec/installable-artifacts/e226e1842d6f2f41/public-install-page/feeaa53dd3df2fe6593c3854e8ef490d)
 
 ## 📝 Deskripsi
 
@@ -39,6 +39,8 @@ Download aplikasi versi terbaru: [Download APK]()
 | 2406358472 | Tristan Rasheed Satria   | PJ Developer      | Blog                        |
 
 ## 📹 Link Video Youtube
+
+https://youtu.be/r54PmINdepQ
 
 ## 🔗 Link PWS
 
