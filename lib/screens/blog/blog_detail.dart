@@ -238,17 +238,6 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
                     ),
                   ),
                   const Spacer(),
-                  // Placeholder untuk profile picture
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(Icons.person, color: Color(0xFF6B8E72)),
-                  ),
                 ],
               ),
             ),
