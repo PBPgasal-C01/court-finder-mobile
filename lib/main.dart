@@ -4,12 +4,16 @@ import 'package:provider/provider.dart';
 import 'models/user_entry.dart';
 import 'screens/login.dart';
 import 'screens/blog/blog_page.dart';
-import 'screens/game-scheduler/game_scheduler_page.dart';
+import 'screens/game_scheduler/game_scheduler_page.dart';
 import 'screens/menu.dart';
+import 'widgets/left_drawer.dart';
 import 'screens/manage-court/manage_court_screen.dart';
-
+import 'screens/court-finder/court_finder_screen.dart';
+import 'screens/welcome_screen.dart';
 import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';
 import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart';
+import 'package:court_finder_mobile/widgets/bottom_nav.dart';
+import 'package:court_finder_mobile/widgets/custom_app_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +35,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B8E72)),
           useMaterial3: true,
         ),
-        home: LoginPage(),
+        home: WelcomePage(),
         debugShowCheckedModeBanner: false,
       ),
     );
@@ -40,163 +44,80 @@ class MyApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   final UserEntry? user;
-  const MainPage({super.key, this.user});
-
-  
+  final int initialIndex;
+  const MainPage({super.key, this.user, this.initialIndex = 0});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex.clamp(0, 5).toInt();
+  }
+
+  String _getPageTitle(int index) {
+    switch (index) {
+      case 0: return "Home";
+      case 1: return "Manage Court";
+      case 2: return "Game Scheduler"; // Atau "Event"
+      case 3: return "Court Finder";
+      case 4: return "Blog";
+      case 5: return "Report";
+      default: return "Court Finder";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-    final sessionCookie = request.cookies.values
-        .firstWhere(
-            (cookie) => cookie.name == 'sessionid', 
-            orElse: () => request.cookies.values.firstWhere(
-                (c) => c.name == 'csrftoken', 
-                orElse: () => Cookie('sessionid', '', DateTime.now().millisecondsSinceEpoch + 3600000) 
-                
-            )
-        )
-        .value;
-        
+    if (widget.user == null) {
+      // No authenticated user; redirect to login rather than showing placeholders.
+      return const LoginPage();
+    }
 
     final List<Widget> pages = [
-      const GameSchedulerPage(),
-      widget.user != null
-        ? ManageCourtScreen(user: widget.user!)
-        : const PlaceholderPage(title: 'Manage Court'),
-      widget.user != null
-        ? MyHomePage(user: widget.user!)
-        : const PlaceholderPage(title: 'Finder'),
-      const BlogPage(),
-      widget.user == null
-          ? const PlaceholderPage(title: 'Report')
-          : (widget.user!.isSuperuser
-              ? const AdminHomeScreen()
-              : const ComplaintScreen()),
+      MyHomePage(user: widget.user!),
+      ManageCourtScreen(user: widget.user!),
+      GameSchedulerPage(user: widget.user!),
+      CourtFinderScreen(),
+      BlogPage(user: widget.user!),
+      widget.user!.isSuperuser
+          ? const AdminHomeScreen()
+          : const ComplaintScreen(),
     ];
 
+    final int activeIndex = _selectedIndex.clamp(0, pages.length - 1).toInt();
+
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: widget.user != null ? LeftDrawer(user: widget.user!) : null,
+
+      // --- PASANG NAV ATAS DISINI ---
+      // Kita sembunyikan AppBar kalau di Home (Index 0) KARENA
+      // biasanya Home punya header besar sendiri (seperti di menu.dart kamu).
+      // TAPI kalau kamu mau Home juga pake navbar kecil ini, hapus kondisi "if" nya.
+      appBar: _selectedIndex == 0
+          ? null // Home pakai header sendiri (opsional)
+          : CustomTopAppBar(
+        title: _getPageTitle(_selectedIndex),
+        user: widget.user!,
+        scaffoldKey: _scaffoldKey,
+      ),
+
       body: IndexedStack(index: _selectedIndex, children: pages),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF6B8E72),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.event, 'Event', 0),
-              _buildNavItem(Icons.edit, 'Manage', 1),
-              _buildCenterLogo(),
-              _buildNavItem(Icons.article, 'Blog', 3),
-              _buildNavItem(Icons.comment, 'Report', 4),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 28),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCenterLogo() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = 2;
-        });
-      },
-      child: Transform.translate(
-        offset: const Offset(0, -10),
-        child: Container(
-          width: 65,
-          height: 65,
-          decoration: BoxDecoration(
-            color: const Color(0xFF4A6B4E),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipOval(
-              child: Image.asset(
-                'static/images/cflogo2.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
-                    Icons.location_on,
-                    color: Colors.white,
-                    size: 35,
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class PlaceholderPage extends StatelessWidget {
-  final String title;
-
-  const PlaceholderPage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: const Color(0xFF6B8E72),
-        foregroundColor: Colors.white,
-      ),
-      body: Center(
-        child: Text(
-          '$title Page',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }

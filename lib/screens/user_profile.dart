@@ -1,6 +1,8 @@
+import 'package:court_finder_mobile/screens/menu.dart';
 import 'package:flutter/material.dart';
 import '../models/user_entry.dart';
 import 'edit_profile.dart';
+import '../main.dart';
 
 class ProfilePage extends StatelessWidget {
   final UserEntry user;
@@ -9,95 +11,142 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const green = Color(0xFF3F6E48);
+    const green = Color(0xFF6CA06E);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
+      body: Stack(
         children: [
-          const SizedBox(height: 60),
-
-          // ================= HEADER TITLE =================
-          const Text(
-            "PROFILE",
-            style: TextStyle(
-              fontSize: 22,
-              color: green,
-              fontWeight: FontWeight.bold,
+          // ================= BACKGROUND PNG (TOP ONLY) =================
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Image.asset(
+              "assets/images/register_login_bg.png",
+              height: 330,
+              width: double.infinity,
+              fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(height: 20),
 
-          // ================= PROFILE IMAGE =================
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 55,
-                backgroundColor: const Color(0xFF6B8E72),
-                child: user.photo != null
-                    ? ClipOval(
-                        child: Image.network(
-                          user.photo!,
-                          width: 110,
-                          height: 110,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
+          // ================= BACK BUTTON =================
+          Positioned(
+            top: 40,
+            left: 20,
+            child: GestureDetector(
+              onTap: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  MainPage(user: user, initialIndex: 0),
+                            ),
+                          ),
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: Colors.white, width: 2),
+                  color: Colors.white.withOpacity(0.65),
+                ),
+                child: const Icon(Icons.arrow_back, color: Color(0xFF3F414E)),
+              ),
+            ),
+          ),
+
+          // ================= MAIN CONTENT =================
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 60),
+
+                // TITLE
+                const Text(
+                  "PROFILE",
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // PROFILE PICTURE WITH EDIT BUTTON
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 55,
+                      backgroundColor: const Color(0xFF6B8E72),
+                      child: user.photo != null && user.photo!.isNotEmpty
+                          ? ClipOval(
+                              child: Image.network(
+                                user.photo!,
+                                width: 110,
+                                height: 110,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.person,
+                                    size: 55,
+                                    color: Colors.white,
+                                  );
+                                },
+                              ),
+                            )
+                          : const Icon(
                               Icons.person,
                               size: 55,
                               color: Colors.white,
-                            );
-                          },
+                            ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => EditProfilePage(user: user),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: green,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.edit, color: Colors.white, size: 18),
                         ),
-                      )
-                    : const Icon(Icons.person, size: 55, color: Colors.white),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => EditProfilePage(user: user),
                       ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: green,
                     ),
-                    child: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
 
-          const SizedBox(height: 40),
+                const SizedBox(height: 40),
 
-          // ================= USER INFO LIST =================
-          _infoTile(icon: Icons.person, label: "NAME", value: user.username),
-          _infoTile(icon: Icons.email, label: "EMAIL", value: user.email),
-          _infoTile(
-            icon: Icons.phone,
-            label: "PHONE NO",
-            value: "+62 80000000", // Replace if phone is added later
-          ),
-          _infoTile(
-            icon: Icons.my_location,
-            label: "COURT PREFERENCE",
-            value: user.preference,
-          ),
+                _infoTile(
+                  icon: Icons.person,
+                  label: "NAME",
+                  value: user.username,
+                ),
+                _infoTile(
+                  icon: Icons.email,
+                  label: "EMAIL",
+                  value: user.email,
+                ),
+                _infoTile(
+                  icon: Icons.my_location,
+                  label: "COURT PREFERENCE",
+                  value: user.preference,
+                ),
 
-          const Spacer(),
+                const Spacer(),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -132,7 +181,7 @@ class ProfilePage extends StatelessWidget {
                 Text(value, style: const TextStyle(fontSize: 16)),
               ],
             ),
-          ),
+          )
         ],
       ),
     );

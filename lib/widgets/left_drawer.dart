@@ -5,9 +5,11 @@ import '/models/user_entry.dart';
 import '/screens/login.dart';
 import '/screens/user_profile.dart';
 import '/screens/admin_dashboard.dart';
-
-import 'package:court_finder_mobile/screens/complain/menu_complaint.dart';       // Untuk User Biasa
+import 'package:court_finder_mobile/main.dart';
+import 'package:court_finder_mobile/screens/game_scheduler/game_scheduler_page.dart';
+import 'package:court_finder_mobile/screens/complain/menu_complaint.dart'; // Untuk User Biasa
 import 'package:court_finder_mobile/screens/complain/menu_admin_complaint.dart'; // Untuk Admin
+import '/screens/welcome_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
   final UserEntry user;
@@ -75,6 +77,7 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.person_outline,
               label: "Profile",
               onTap: () {
+                Navigator.pop(context);
                 // Navigate to Profile Page (remove `const` because `user` is runtime)
                 Navigator.push(
                   context,
@@ -84,18 +87,19 @@ class LeftDrawer extends StatelessWidget {
             ),
 
             _drawerItem(
-              icon: Icons.report_gmailerrorred_outlined,
-              label: "Report",
-              onTap: () {
-                // TODO: Navigate to Complaint Page
-              },
-            ),
-
-            _drawerItem(
               icon: Icons.article_outlined,
               label: "Blog",
               onTap: () {
-                // TODO: Navigate to Blog Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 4, // 4 = Blog
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -103,7 +107,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.location_on_outlined,
               label: "Finder",
               onTap: () {
-                // TODO: Navigate to Finder Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 3, // 3 = Court Finder
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -111,7 +124,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.edit_outlined,
               label: "Manage",
               onTap: () {
-                // TODO: Navigate to Manage Booking / Court Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 1, // 1 = Manage Court
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -119,7 +141,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.event_outlined,
               label: "Event",
               onTap: () {
-                // TODO: Navigate to Event Page
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 2, // 2 = Event tab
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -127,20 +158,16 @@ class LeftDrawer extends StatelessWidget {
               icon: Icons.warning_amber_rounded, // Icon yang cocok untuk report
               label: "Report",
               onTap: () {
-                // Cek apakah user adalah Admin (Superuser)
-                if (user.isSuperuser) {
-                  // Jika Admin, ke Halaman Dashboard Admin Complaint
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
-                  );
-                } else {
-                  // Jika User Biasa, ke Halaman Complaint List User
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ComplaintScreen()),
-                  );
-                }
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainPage(
+                      user: user,
+                      initialIndex: 5, // 5 = Report/Complaint
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -151,6 +178,7 @@ class LeftDrawer extends StatelessWidget {
                 label: "Manage Users",
                 onTap: () {
                   // TODO: Navigate to Admin Manage Users Page
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => AdminDashboardPage()),
@@ -166,12 +194,12 @@ class LeftDrawer extends StatelessWidget {
               label: "Logout",
               onTap: () async {
                 await request.logout(
-                  "http://127.0.0.1:8000/auth/logout-flutter/",
+                  "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/logout-flutter/",
                 );
                 if (!context.mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  MaterialPageRoute(builder: (_) => const WelcomePage()),
                   (route) => false,
                 );
               },

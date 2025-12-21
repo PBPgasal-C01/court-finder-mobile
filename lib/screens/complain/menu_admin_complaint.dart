@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async'; 
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:court_finder_mobile/models/complain/complaint_entry.dart';
 import 'package:court_finder_mobile/widgets/complain/admin_complaint_card.dart';
 
-import 'package:court_finder_mobile/screens/complain/edit_complain.dart'; 
+import 'package:court_finder_mobile/screens/complain/edit_complain.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -16,15 +18,36 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   final Color primaryGreen = const Color(0xFF7FA580);
+  String _selectedFilter = 'ALL';
+  
+  Timer? _timer; 
 
-  String _selectedFilter = 'ALL'; 
+  @override
+  void initState() {
+    super.initState();
+    // Auto-Refresh setiap 5 detik
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        setState(() {
+          print("Auto-refreshing admin data...");
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   Future<List<ComplaintEntry>> fetchComplaints() async {
+    String baseUrl = kIsWeb
+        ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id' // Production
+        : 'http://10.0.2.2:8000'; // Android Emulator Local
 
-    String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
+    var url = Uri.parse('$baseUrl/complain/admin/json-flutter/');
 
-    var url = Uri.parse('$baseUrl/complain/admin/json-flutter/'); 
-    
     try {
       var response = await http.get(
         url,
@@ -41,9 +64,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       for (var d in data) {
         if (d != null) {
           try {
-             listComplaint.add(ComplaintEntry.fromJson(d));
+            if (!kIsWeb && d['foto_url'] != null && d['foto_url'] is String) {
+              String rawUrl = d['foto_url'];
+              if (rawUrl.contains('127.0.0.1')) {
+                d['foto_url'] = rawUrl.replaceFirst('127.0.0.1', '10.0.2.2');
+              }
+            }
+
+            listComplaint.add(ComplaintEntry.fromJson(d));
           } catch (e) {
-             print("Gagal parsing item ini: $d | Error: $e");
+            print("Gagal parsing item ini: $d | Error: $e");
           }
         }
       }
@@ -51,28 +81,28 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
     } catch (e) {
       print("Error fetching complaints utama: $e");
-      return []; 
+      return [];
     }
   }
 
   List<ComplaintEntry> _filterData(List<ComplaintEntry> allData) {
     if (_selectedFilter == 'ALL') {
       return allData;
-    } 
-
+    }
+    // FILTER: REVIEW
     else if (_selectedFilter == 'REVIEW') {
       return allData.where((item) {
         return item.status.toLowerCase() == 'in review';
       }).toList();
-    } 
-
+    }
+    // FILTER: PROCESS
     else if (_selectedFilter == 'PROCESS') {
       return allData.where((item) {
         String status = item.status.toLowerCase();
-
         return status == 'in process';
       }).toList();
-    } 
+    }
+    // FILTER: DONE
     else if (_selectedFilter == 'DONE') {
       return allData.where((item) {
         return item.status.toLowerCase() == 'done';
@@ -146,9 +176,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
           const SizedBox(height: 25),
 
-
           SingleChildScrollView(
-            scrollDirection: Axis.horizontal, 
+            scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -157,7 +186,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 const SizedBox(width: 8),
                 _buildFilterTab("REVIEW"),
                 const SizedBox(width: 8),
-                _buildFilterTab("PROCESS"), 
+                _buildFilterTab("PROCESS"),
                 const SizedBox(width: 8),
                 _buildFilterTab("DONE"),
               ],
@@ -168,7 +197,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
           Expanded(
             child: FutureBuilder(
-              future: fetchComplaints(),
+              future: fetchComplaints(), // Dipanggil ulang tiap 5 detik (Timer)
               builder: (context, AsyncSnapshot<List<ComplaintEntry>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -189,7 +218,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   List<ComplaintEntry> filteredList = _filterData(snapshot.data!);
 
                   if (filteredList.isEmpty) {
-                    return _buildEmptyState(); 
+                    return _buildEmptyState();
                   }
 
                   return ListView.builder(
@@ -204,15 +233,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ComplaintDetailEditPage(
-                                complaintId: complaint.id, 
-                                complaint: complaint,      
+                                complaintId: complaint.id,
+                                complaint: complaint,
                               ),
                             ),
                           );
 
                           if (shouldRefresh == true) {
                             setState(() {
-                              print("Data updated, refreshing list...");
+                              print("Manual refresh after update...");
                             });
                           }
                         },
@@ -237,7 +266,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         });
       },
       child: Container(
-
         constraints: const BoxConstraints(minWidth: 80),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         height: 35,
@@ -270,7 +298,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           width: 150,
           height: 150,
           fit: BoxFit.contain,
-          color: Colors.grey[300], 
+          color: Colors.grey[300],
           colorBlendMode: BlendMode.srcIn,
           errorBuilder: (_,__,___) => Icon(Icons.folder_open, size: 80, color: Colors.grey[300]),
         ),

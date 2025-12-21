@@ -15,7 +15,8 @@ class ComplaintDetailEditPage extends StatefulWidget {
   });
 
   @override
-  State<ComplaintDetailEditPage> createState() => _ComplaintDetailEditPageState();
+  State<ComplaintDetailEditPage> createState() =>
+      _ComplaintDetailEditPageState();
 }
 
 class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
@@ -28,11 +29,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
   String? _selectedStatus;
   bool _isLoading = false;
 
-  final List<String> _statusOptions = [
-    'IN REVIEW',
-    'IN PROCESS',
-    'DONE',
-  ];
+  final List<String> _statusOptions = ['IN REVIEW', 'IN PROCESS', 'DONE'];
 
   @override
   void initState() {
@@ -50,7 +47,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
     } else {
       _selectedStatus = _statusOptions[0];
     }
-    
+
     _komentarController.text = widget.complaint.komentar?.toString() ?? '';
   }
 
@@ -70,8 +67,8 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
 
       try {
         String baseUrl = "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id";
-
-        final String url = '$baseUrl/complain/update-flutter/${widget.complaintId}/';
+        final String url =
+            '$baseUrl/complain/update-flutter/${widget.complaintId}/';
 
         final response = await request.postJson(
           url,
@@ -101,9 +98,9 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
         }
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Terjadi kesalahan: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
       } finally {
         if (mounted) {
           setState(() {
@@ -184,7 +181,6 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Image (if exists)
                     if (widget.complaint.fotoUrl.isNotEmpty) ...[
                       Container(
                         width: double.infinity,
@@ -219,9 +215,13 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                                 color: _inputBoxColor,
                                 child: Center(
                                   child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
                                         : null,
                                   ),
                                 ),
@@ -294,7 +294,9 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
-                                side: const BorderSide(color: Color(0xFFF5C6CB)),
+                                side: const BorderSide(
+                                  color: Color(0xFFF5C6CB),
+                                ),
                               ),
                               elevation: 0,
                             ),
@@ -325,7 +327,9 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
                                 : const Text(
                                     "UPDATE",
@@ -372,10 +376,7 @@ class _ComplaintDetailEditPageState extends State<ComplaintDetailEditPage> {
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Color(0xFF4A4A4A),
-        ),
+        style: const TextStyle(fontSize: 14, color: Color(0xFF4A4A4A)),
         maxLines: maxLines,
       ),
     );
