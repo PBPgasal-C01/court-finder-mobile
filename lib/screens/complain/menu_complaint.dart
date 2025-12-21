@@ -23,11 +23,13 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
 
   Future<List<ComplaintEntry>> fetchComplaints(CookieRequest request) async {
     // ... logic fetch tetap sama (copy dari file lamamu) ...
-    String baseUrl = kIsWeb ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id' : 'http://10.0.2.2:8000';
+    String baseUrl = 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
     var url = '$baseUrl/complain/json-flutter/';
     var response = await request.get(url);
     List<ComplaintEntry> list = [];
-    for(var d in response){ if(d!=null) list.add(ComplaintEntry.fromJson(d)); }
+    for (var d in response) {
+      if (d != null) list.add(ComplaintEntry.fromJson(d));
+    }
     return list;
   }
 
@@ -57,8 +59,10 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
         child: FutureBuilder(
           future: fetchComplaints(request),
           builder: (context, AsyncSnapshot<List<ComplaintEntry>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-            if (!snapshot.hasData || snapshot.data!.isEmpty) return Center(child: Text("No reports yet"));
+            if (snapshot.connectionState == ConnectionState.waiting)
+              return const Center(child: CircularProgressIndicator());
+            if (!snapshot.hasData || snapshot.data!.isEmpty)
+              return Center(child: Text("No reports yet"));
 
             return ListView.builder(
               padding: const EdgeInsets.only(top: 16, bottom: 80),
@@ -69,7 +73,11 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                     padding: EdgeInsets.fromLTRB(24, 0, 24, 10),
                     child: Text(
                       "Report Archive",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF3F5940)),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF3F5940),
+                      ),
                     ),
                   );
                 }

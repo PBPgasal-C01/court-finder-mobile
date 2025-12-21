@@ -54,9 +54,7 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const AddCourtScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const AddCourtScreen()),
           );
           _refreshCourts();
         },
@@ -70,11 +68,15 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
         future: _courtsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: primaryGreen));
+            return Center(
+              child: CircularProgressIndicator(color: primaryGreen),
+            );
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Failed to load data: ${snapshot.error}'));
+            return Center(
+              child: Text('Failed to load data: ${snapshot.error}'),
+            );
           }
 
           final courts = snapshot.data ?? [];
@@ -84,7 +86,11 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.location_on, size: 80, color: primaryGreen.withOpacity(0.5)),
+                  Icon(
+                    Icons.location_on,
+                    size: 80,
+                    color: primaryGreen.withOpacity(0.5),
+                  ),
                   const SizedBox(height: 20),
                   const Text(
                     "Don't have any Court",
@@ -110,9 +116,8 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
               itemBuilder: (context, index) {
                 final court = courts[index];
 
-                final String baseUrl = kIsWeb
-                    ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id'
-                    : 'http://10.0.2.2:8000';
+                final String baseUrl =
+                    'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id';
 
                 String imageUrl = "";
                 if (court.photoUrl != null && court.photoUrl!.isNotEmpty) {
@@ -123,38 +128,70 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
 
                 return Card(
                   elevation: 3,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade50,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               court.name.toUpperCase(),
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            Text(court.courtType, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+                            Text(
+                              court.courtType,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey[600],
+                              ),
+                            ),
                           ],
                         ),
                       ),
 
                       Expanded(
                         child: (imageUrl.isNotEmpty)
-                            ? Image.network(imageUrl, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(color: Colors.grey[200]))
-                            : Container(color: Colors.grey[200], child: const Icon(Icons.sports_soccer, color: Colors.grey)),
+                            ? Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    Container(color: Colors.grey[200]),
+                              )
+                            : Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.sports_soccer,
+                                  color: Colors.grey,
+                                ),
+                              ),
                       ),
 
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(court.address, style: const TextStyle(fontSize: 10), maxLines: 2),
+                        child: Text(
+                          court.address,
+                          style: const TextStyle(fontSize: 10),
+                          maxLines: 2,
+                        ),
                       ),
 
                       Padding(
@@ -163,25 +200,52 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             InkWell(
-                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CourtDetailScreen(court: court))),
-                              child: const Text('DETAIL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      CourtDetailScreen(court: court),
+                                ),
+                              ),
+                              child: const Text(
+                                'DETAIL',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             Row(
                               children: [
                                 InkWell(
-                                  onTap: () => _showDeleteDialog(context, court),
-                                  child: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                  onTap: () =>
+                                      _showDeleteDialog(context, court),
+                                  child: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 InkWell(
                                   onTap: () async {
-                                    await Navigator.push(context, MaterialPageRoute(builder: (_) => EditCourtScreen(court: court)));
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            EditCourtScreen(court: court),
+                                      ),
+                                    );
                                     _refreshCourts();
                                   },
-                                  child: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    color: Colors.blue,
+                                    size: 20,
+                                  ),
                                 ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -204,7 +268,10 @@ class _ManageCourtScreenState extends State<ManageCourtScreen> {
           title: const Text("Delete Court"),
           content: Text("Are you sure you want to delete '${court.name}'?"),
           actions: <Widget>[
-            TextButton(child: const Text("Cancel"), onPressed: () => Navigator.of(dialogContext).pop()),
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
             TextButton(
               child: const Text("Delete", style: TextStyle(color: Colors.red)),
               onPressed: () async {
