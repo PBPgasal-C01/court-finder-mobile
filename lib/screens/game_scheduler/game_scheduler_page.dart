@@ -57,6 +57,7 @@ class _GameSchedulerPageState extends State<GameSchedulerPage> {
 
       floatingActionButton: request.loggedIn
           ? FloatingActionButton(
+        heroTag: null,
         backgroundColor: primaryGreen,
         onPressed: () async {
           await Navigator.push(context, MaterialPageRoute(builder: (_) => const GameSchedulerFormPage()));

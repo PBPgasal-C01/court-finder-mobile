@@ -71,16 +71,22 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       );
 
       if (response['ok'] == true) {
+        final bool previous = _isFavorited;
+        final bool isFavoritedOnServer = response['favorited'] == true;
         setState(() {
-          _isFavorited = !_isFavorited;
-          _favoritesChanged = true;
+          _isFavorited = isFavoritedOnServer;
+          if (previous != isFavoritedOnServer) {
+            _favoritesChanged = true;
+          }
         });
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                _isFavorited ? 'Added to favorites' : 'Removed from favorites',
+                isFavoritedOnServer
+                    ? 'Added to favorites'
+                    : 'Removed from favorites',
               ),
               duration: const Duration(seconds: 1),
               backgroundColor: const Color(0xFF6B8E72),
@@ -168,6 +174,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       backgroundColor: const Color(0xFF6B8E72),
       floatingActionButton: (widget.user?.isSuperuser ?? false)
           ? FloatingActionButton(
+              heroTag: null,
               onPressed: () async {
                 final result = await Navigator.push(
                   context,

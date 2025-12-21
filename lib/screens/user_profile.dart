@@ -77,11 +77,29 @@ class ProfilePage extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 55,
-                      backgroundImage: user.photo != null && user.photo!.isNotEmpty
-                          ? NetworkImage(user.photo!)
-                          : const AssetImage("assets/default.png") as ImageProvider,
+                      backgroundColor: const Color(0xFF6B8E72),
+                      child: user.photo != null && user.photo!.isNotEmpty
+                          ? ClipOval(
+                              child: Image.network(
+                                user.photo!,
+                                width: 110,
+                                height: 110,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.person,
+                                    size: 55,
+                                    color: Colors.white,
+                                  );
+                                },
+                              ),
+                            )
+                          : const Icon(
+                              Icons.person,
+                              size: 55,
+                              color: Colors.white,
+                            ),
                     ),
-
                     Positioned(
                       bottom: 0,
                       right: 0,

@@ -9,7 +9,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Aplikasi memerlukan akses galeri untuk memilih foto</string>
 	<key>CFBundleDisplayName</key>
-	<string>Court Finder Mobile</string>
+	<string>Court Finder</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

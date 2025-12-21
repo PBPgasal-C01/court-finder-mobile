@@ -16,7 +16,7 @@ class BlogPage extends StatefulWidget {
   State<BlogPage> createState() => _BlogPageState();
 }
 
-class _BlogPageState extends State<BlogPage> {
+class _BlogPageState extends State<BlogPage> with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
   List<BlogPost> _blogPosts = [];
   List<BlogPost> _filteredPosts = [];
@@ -27,7 +27,15 @@ class _BlogPageState extends State<BlogPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadData();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && widget.user != null) {
+      _fetchFavorites();
+    }
   }
 
   Future<void> _loadData() async {
@@ -112,10 +120,17 @@ class _BlogPageState extends State<BlogPage> {
       final response = await BlogService.toggleFavorite(request, post.id);
 
       if (response['ok'] == true) {
+        final bool isFavoritedOnServer = response['favorited'] == true;
+        // Reconcile local state with server (important if local cache is stale)
+        setState(() {
+          if (isFavoritedOnServer) {
+            _favoriteIds.add(post.id);
+          } else {
+            _favoriteIds.remove(post.id);
+          }
+        });
         _showMessage(
-          response['favorited'] == true
-              ? 'Added to favorites'
-              : 'Removed from favorites',
+          isFavoritedOnServer ? 'Added to favorites' : 'Removed from favorites',
           isSuccess: true,
         );
       } else {
@@ -222,6 +237,7 @@ class _BlogPageState extends State<BlogPage> {
       // Floating Action Button hanya untuk Superuser
       floatingActionButton: (widget.user?.isSuperuser ?? false)
           ? FloatingActionButton(
+              heroTag: null,
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -293,7 +309,7 @@ class _BlogPageState extends State<BlogPage> {
             child: IconButton(
               icon: const Icon(Icons.refresh, color: Colors.white),
               tooltip: 'Refresh',
-              onPressed: _fetchBlogPosts,
+              onPressed: _loadData,
             ),
           ),
           const SizedBox(width: 10),
@@ -354,10 +370,7 @@ class _BlogPageState extends State<BlogPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _fetchBlogPosts,
-              child: const Text('Retry'),
-            ),
+            ElevatedButton(onPressed: _loadData, child: const Text('Retry')),
           ],
         ),
       );
@@ -418,6 +431,7 @@ class _BlogPageState extends State<BlogPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     super.dispose();
   }
@@ -489,7 +503,18 @@ class _FavoritesPageState extends State<_FavoritesPage> {
       final request = context.read<CookieRequest>();
       final response = await BlogService.toggleFavorite(request, post.id);
 
-      if (response['ok'] != true) {
+      if (response['ok'] == true) {
+        final bool isFavoritedOnServer = response['favorited'] == true;
+        if (mounted) {
+          setState(() {
+            if (isFavoritedOnServer) {
+              _favoriteIds.add(post.id);
+            } else {
+              _favoriteIds.remove(post.id);
+            }
+          });
+        }
+      } else {
         if (mounted) {
           setState(() {
             if (previousState) {
