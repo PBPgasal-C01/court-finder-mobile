@@ -102,7 +102,7 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 |                | Registered User                                                                                                                                   | Admin                  |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
-| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya *noted: di models ada partisipan sama creator) | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya *noted: di models ada partisipan sama creator) |
+| Peran Pengguna | Dapat melakukan CRUD (Create, Read, Update, Delete) (user yang login = creator, creator dapat mengikuti jadwal permainan dan dapat tidak mengikuti jadwal permainan nya *noted: di models ada partisipan sama creator) | Sama seperti Registered user |
 
 ---
 
@@ -112,7 +112,7 @@ https://docs.google.com/document/d/1XPr0RdUumJm2YWlrm4AMsrK8ALj-I9bUs48UgpPLh5M/
 
 |                | Registered User                         | Admin                                                                                                  |
 | -------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Peran Pengguna | Dapat melapor masalah terkait lapangan & menghapus laporan selagi masih dalam status "In Review" | Dapat merespons laporan, memperbarui status (In Review, In Process, Done), dan mengelola semua report. |
+| Peran Pengguna | Dapat melapor masalah terkait lapangan & menghapus laporan selagi masih dalam status "In Review" | Dapat merespons laporan, memperbarui status (In Review, In Process, Done), dan memberi komentar pada semua report. |
 
 ---
 
