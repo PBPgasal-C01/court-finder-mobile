@@ -10,6 +10,8 @@
 
 ---
 
+[![Build Status](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec/status.svg?token=OJYoiOqufHzitDOSQlYIOA&branch=main)](https://app.bitrise.io/app/78dbfbf3-5f80-4f6c-94a2-cbd904f40cec)
+
 ## 📝 Deskripsi
 
 **Court Finder** adalah aplikasi yang membantu masyarakat umum menemukan dan memantau ketersediaan fasilitas/lapangan olahraga terdekat secara real-time, menjawab kesulitan pemain kasual maupun komunitas yang sering harus datang langsung atau bergantung pada informasi tercecer di internet maupun grup chat. Selain menampilkan lokasi, aplikasi juga memberikan detail kondisi lapangan (indoor/outdoor, gratis/berbayar, material lantai,dll), bisa bermain dengan orang lain dan bisa mengecek ada event apa aja yang tersedia.Selain itu, Court Finder juga berfungsi sebagai platform bagi pemilik lapangan untuk mendaftarkan, mengelola, dan mempromosikan fasilitas olahraga mereka ke audiens yang lebih luas.
