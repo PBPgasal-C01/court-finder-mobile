@@ -106,7 +106,6 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
 
         String? base64Image;
         if (_selectedImage != null) {
-          // UBAH 3: Baca bytes langsung dari XFile (aman untuk web)
           List<int> imageBytes = await _selectedImage!.readAsBytes();
           String base64Str = base64Encode(imageBytes);
           base64Image = "data:image/jpeg;base64,$base64Str";
@@ -157,8 +156,6 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ... Bagian UI build tetap sama persis seperti sebelumnya ...
-    // (Copy bagian Widget build kamu yang tadi sudah benar)
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -382,7 +379,6 @@ class _AddComplaintPageState extends State<AddComplaintPage> {
     );
   }
 
-  // Widget _buildLabel dan _buildTextField sama seperti sebelumnya
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),

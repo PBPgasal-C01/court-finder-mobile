@@ -3,7 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:court_finder_mobile/screens/register.dart';
+import 'package:flutter/material.dart';
+import 'package:court_finder_mobile/main.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:court_finder_mobile/models/user_entry.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:court_finder_mobile/screens/menu.dart';
 import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -24,6 +31,121 @@ class _RegisterPageState extends State<RegisterPage> {
 
   File? _selectedImage;
   String _preference = "Both";
+  bool _isSigningIn = false;
+
+  Future<void> _handleGoogleLogin(BuildContext context) async {
+    final request = context.read<CookieRequest>();
+    if (_isSigningIn) return; // prevent double taps
+    setState(() {
+      _isSigningIn = true;
+    });
+
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId: '297845326726-n5q3f1f29s72j87e34cpft7d8sppivel.apps.googleusercontent.com', // Web/Django
+      scopes: ['email', 'profile'],
+    );
+
+      // Force chooser by signing out first (this clears any cached account)
+      try {
+        await googleSignIn.signOut();
+        // small delay to ensure sign-out processed on some devices
+        await Future.delayed(const Duration(milliseconds: 200));
+      } catch (e) {
+        // ignore signOut errors, continue to signIn
+        print('Warning: signOut before signIn failed: $e');
+      }
+
+      final GoogleSignInAccount? account = await googleSignIn.signIn();
+
+      if (account == null) {
+        print("User cancelled Google login");
+        return;
+      }
+
+      final GoogleSignInAuthentication auth = await account.authentication;
+
+      final idToken = auth.idToken;
+      print("ID TOKEN = $idToken");
+
+      if (idToken == null) {
+        print("Google login failed: no idToken");
+        return;
+      }
+
+      print("Google ID Token retrieved for ${account.email}. Sending to Django...");
+
+    try {
+      final response = await request.post(
+        "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/google-mobile-login/",
+        {"id_token": idToken},
+      );
+
+      print("Django Response: $response");
+      print("Response Type: ${response.runtimeType}");
+
+      if (response is Map && response["status"] == "success") {
+        final userJson = await request.get(
+          "https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/auth/user-flutter/",
+        );
+
+        UserEntry user = UserEntry.fromJson(userJson);
+
+        if (!context.mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                MainPage(user: user, initialIndex: 0),
+          ),
+        );
+      } else {
+        if (!context.mounted) return;
+        String errorMsg = "Unknown error";
+        if (response is Map) {
+          errorMsg = response["error"] ?? response["message"] ?? "Login failed";
+        } else {
+          errorMsg = "Unexpected response: $response";
+        }
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Google Login Failed"),
+            content: Text(errorMsg),
+            actions: [
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error during Google login: $e");
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text("Exception: $e"),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSigningIn = false;
+        });
+      }
+    }
+  }
 
   Future<void> pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -161,9 +283,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // GOOGLE SIGNUP BUTTON
                   GestureDetector(
-                    onTap: () {
-                      // OPTIONAL: Integrate Google register if needed
-                    },
+                    onTap: () => _handleGoogleLogin(context),
                     child: Container(
                       width: double.infinity,
                       height: 63,
