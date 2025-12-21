@@ -38,12 +38,18 @@ Download aplikasi versi terbaru: [Download APK]()
 | 2406405304 | Alfino Ahmad Feriza      | PJ Developer      | Autentikasi                 |
 | 2406358472 | Tristan Rasheed Satria   | PJ Developer      | Blog                        |
 
-## 🔗 Link Video Youtube
+## 📹 Link Video Youtube
+
+## 🔗 Link PWS
+
+https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id/
 
 ## 🎨 Link Design
 
+Link Design Website:
 https://www.figma.com/design/PdASDdg1WngWONePYMoFxW/Design-System?node-id=108-727&t=Isu8lalSrYHcemyl-1
 
+Link Design Mobile App:
 https://www.figma.com/design/ezyGnnjO8O5jLVmO1aatXT/Mobile-Prototype?node-id=66-255&t=FdVNFYA7ZzYKELhm-0
 
 ## 📊 Link Sumber Dataset
