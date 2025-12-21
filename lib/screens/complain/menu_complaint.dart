@@ -6,6 +6,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:async';
+import 'dart:convert';
 
 class ComplaintScreen extends StatefulWidget {
   const ComplaintScreen({super.key});
@@ -114,6 +115,57 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                   onTap: () {
                   },
                   onDelete: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Delete Report'),
+                        content: const Text('Are you sure you want to delete this report? '),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    ) ?? false;
+
+                    if (!confirm || !mounted) return;
+
+                    try {
+                      final baseUrl = kIsWeb
+                          ? 'https://tristan-rasheed-court-finder.pbp.cs.ui.ac.id'
+                          : 'http://10.0.2.2:8000';
+
+                      final response = await request.postJson(
+                        '$baseUrl/complain/delete-flutter/${complaint.id}/',
+                        jsonEncode({}), 
+                      );
+
+                      if (!mounted) return;
+
+                      if (response['status'] == 'success') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response['message'] ?? "Berhasil dihapus")),
+                        );
+                        _refreshComplaints(); 
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(response['message'] ?? "Gagal menghapus"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Terjadi kesalahan: $e"), backgroundColor: Colors.red),
+                      );
+                    }
                   },
                 );
               },
